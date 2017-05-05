@@ -1,0 +1,3 @@
+[submodule "libCompanion"]
+	path = libCompanion
+	url = https://github.com/LibCompanion/libCompanion.git
