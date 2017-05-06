@@ -4,8 +4,7 @@ CompanionWinRT wraps the [libCompanion](https://github.com/LibCompanion/libCompa
 
 # Dependencies
 
-* OpenCV 3.x (you've got to build it for UWP first - will be provided as a submodule in near future)
-* libCompanion (provided as a submodule)
+* OpenCV 3.x (has to be build for UWP first)
 
 # Building CompanionWinRT
 
@@ -19,13 +18,13 @@ CompanionWinRT wraps the [libCompanion](https://github.com/LibCompanion/libCompa
 # Getting started
 
 Feel free to use the provided sample app as a starting point. Unfortunately CMake is currently not able to integrate the C# project to the generated Visual Studio Solution automatically. Follow these steps to do that manually:
-1. Open the generated Solution "_\<build_dir\>\\CompanionWinRT.sln_" in Visual Studio.
-2. `File` > `Open` > `Project/Solution...` Select the project file _CompanionUWPSample.csproj_ from "_\<build_dir\>\\CompanionUWPSample\\_" and choose `Add to Solution`.
-> Be aware that the sample project is being copied to the build directory so it won't be under version control.
-3. Add the CompanionWinRT project as a reference to the CompanionUWPSample project: right click on the project name and choose `Add` > `Reference...`.
-4. Right click on `CompanionUWPSample` and choose `Set as StartUp Project`.
-5. Add your own image samples and an image source folder to the project assets (video as a source is not supported at the moment).
-6. Add your OpenCV-DLLs to the project by right clicking on `CompanionUWPSample` and choosing `Add` > `Existing Item...`.
+1. Open the generated Solution _\<build_dir\>\\CompanionWinRT.sln_ in Visual Studio
+2. `File` > `Open` > `Project/Solution...` Select the project file _CompanionUWPSample.csproj_ from _\<build_dir\>\\CompanionUWPSample\\_ and choose `Add to Solution`
+> Be aware that the sample project is being copied to the build directory so it won't be under version control
+3. Add the `CompanionWinRT` project as a reference to the `CompanionUWPSample` project: right click on the project name and choose `Add` > `Reference...`
+4. Right click on `CompanionUWPSample` and choose `Set as StartUp Project`
+5. Add your own image samples and an image source folder to the project assets (video as a source is not supported at the moment)
+6. Add your OpenCV-DLLs to the project by right clicking on `CompanionUWPSample` and choosing `Add` > `Existing Item...`
 
 # Known Issues
 * Currently the sample app is only working when using the debug build.
