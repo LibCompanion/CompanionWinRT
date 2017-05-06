@@ -4,11 +4,13 @@
 
 # Dependencies
 
-* OpenCV Version 3.X
-* libCompanion
+* OpenCV Version 3.x (you've got to build it for UWP first, v.i. - will be provided as a submodule in the future)
+* libCompanion (provided as submodule)
 
-# CMake project
+# Using CMake
 
+...
+1. libCompanion is integraded as a submodul so cmake-gui will ask you if you want to use Cuda. Cuda is not supported for Windows Runtime.
 ...
 
 ## Build CompanionWinRTWrapper
@@ -17,7 +19,21 @@ Simply use cmake or cmake-gui to build CompanionWinRTWrapper for your platform.
 
 # Getting started
 
+### Build OpenCV 3.x for UWP
+
 ...
+1. open project
+2. add to solution
+3. reference CompanionWinRT project
+3. set as startup project
+4. Add your own image samples and image source folder to the project assets
+5. Unfortunately you will have to copy your opencv DLLs into the project by right
+clicking on the project name and choose ```Add``` > ```Existing Item...```
+...
+
+
+# Known Bugs
+* The sample app is currently only working when using the debug build.
 
 ### License
 

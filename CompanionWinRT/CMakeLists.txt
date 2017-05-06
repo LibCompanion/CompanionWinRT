@@ -1,7 +1,3 @@
-# Eliminate deprecation errors
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D _CRT_SECURE_NO_WARNINGS")
-
-
 # Add source files
 SET(SOURCE
     Configuration.cpp Configuration.h
@@ -26,6 +22,7 @@ endforeach()
 add_library(CompanionWinRT SHARED ${SOURCE})
 set_target_properties(CompanionWinRT PROPERTIES VS_WINRT_COMPONENT TRUE)
 set_target_properties(CompanionWinRT PROPERTIES VS_GLOBAL_ROOTNAMESPACE "CompanionWinRT")
+set_target_properties(CompanionWinRT PROPERTIES FOLDER "CompanionWinRT")
 
 
 # Set linked libraries

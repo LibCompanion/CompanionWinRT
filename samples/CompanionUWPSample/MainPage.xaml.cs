@@ -41,12 +41,17 @@ namespace CompanionUWPSample
         /**
          * The path to the assets folder of this app (read only).
          */
-        private String assetPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + "\\Assets\\";
+        private String assetPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + "\\Assets";
 
         /**
          * The path to the temp folder of this app to store temporary data.
          */
-        private String tempPath = ApplicationData.Current.TemporaryFolder.Path + "\\";
+        private String tempPath = ApplicationData.Current.TemporaryFolder.Path;
+
+        /**
+         * The path to the image folder that is used as an input source for the Companion processing example.
+         */
+        private String imageFolderPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + "\\Assets\\Muelheim_HBF";
 
         /**
          * Cached working item on working thread so it can be cancled by the user.
@@ -81,18 +86,20 @@ namespace CompanionUWPSample
          */
         async protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Sample_Source3.jpg"));
-            if (file != null)
+            try
             {
-                // Get the size of the image for the WriteableBitmap constructor.
+                // Get the size of the images for the WriteableBitmap constructor.
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(this.imageFolderPath);
+                IReadOnlyList<StorageFile> fileList = await folder.GetFilesAsync();
+                StorageFile file = fileList[0];
                 ImageProperties props = await file.Properties.GetImagePropertiesAsync();
                 this.m_bm = new WriteableBitmap((int)props.Height, (int)props.Width);
                 m_bm.SetSource(await file.OpenReadAsync());
                 this.image.Source = m_bm;
             }
-            else
+            catch (System.Exception ex)
             {
-                UpdateUIOutput("Initial file not found.");
+                UpdateUIOutput("Image source not found.");
             }
         }
 
@@ -104,8 +111,6 @@ namespace CompanionUWPSample
             if (!this.isRunning)
             {
                 this.isRunning = true;
-
-                String imageFolder = this.assetPath + "Muelheim_HBF";
 
                 try
                 {
@@ -124,7 +129,7 @@ namespace CompanionUWPSample
                     await configuration.setSkipFrame(40);
 
                     // Create a WritableBitmap as the output destination for Companion
-                    //this.CreateBitmap(imageFolder + "\\Muelheim_HBF 001.jpg");
+                    //this.CreateBitmap(new Uri(this.imageSourceURI, "Muelheim_HBF 001.jpg"));
 
                     // Set pixel buffer of this App's WritableBitmap (has to be done on the UI thread)
                     CW.Configuration.setPixelBuffer(this.m_bm.PixelBuffer);
@@ -136,13 +141,13 @@ namespace CompanionUWPSample
                     };
 
                     // Set input source (image folder because video source is not supported right now)
-                    CW.ImageStream stream = await this.CreateImageStream(imageFolder);
+                    CW.ImageStream stream = await this.CreateImageStream(this.imageFolderPath);
                     await configuration.setSource(stream);
 
                     // Create feature matching models
-                    CW.FeatureMatchingModel model1 = await this.CreateFeatureMatchingModel(this.assetPath + "Sample_Left.jpg");
-                    CW.FeatureMatchingModel model2 = await this.CreateFeatureMatchingModel(this.assetPath + "Sample_Middle.jpg");
-                    CW.FeatureMatchingModel model3 = await this.CreateFeatureMatchingModel(this.assetPath + "Sample_Right.jpg");
+                    CW.FeatureMatchingModel model1 = await this.CreateFeatureMatchingModel(this.assetPath + "\\Sample_Left.jpg");
+                    CW.FeatureMatchingModel model2 = await this.CreateFeatureMatchingModel(this.assetPath + "\\Sample_Middle.jpg");
+                    CW.FeatureMatchingModel model3 = await this.CreateFeatureMatchingModel(this.assetPath + "\\Sample_Right.jpg");
 
                     // Add feature matching models
                     await configuration.addModel(model1);
