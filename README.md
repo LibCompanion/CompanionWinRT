@@ -1,11 +1,11 @@
-#![Companion](https://nepitwin.github.io/libCompanion/images/logo.png "Companion")
+# CompanionWinRT
 
-[CompanionWinRTWrapper](https://nepitwin.github.io/libCompanion) wrapps the Companiom computer vision library (libCompanion) in a Windows Runtime Component. Since it uses C++/CX, the WinRT Component can be used in Universal Windows Apps that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
+CompanionWinRT wrapps the Companion computer vision library [(libCompanion)](https://github.com/LibCompanion/libCompanion/) in a Windows Runtime Component. Since it uses C++/CX, the WinRT Component can be used in Universal Windows Apps (UWP) that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
 
 # Dependencies
 
-* OpenCV Version 3.x (you've got to build it for UWP first, v.i. - will be provided as a submodule in the future)
-* libCompanion (provided as submodule)
+* OpenCV Version 3.x (you've got to build it for UWP first, v.i. - will be provided as a submodule in near future)
+* libCompanion (provided as a submodule)
 
 # Using CMake
 
@@ -13,9 +13,9 @@
 1. libCompanion is integraded as a submodul so cmake-gui will ask you if you want to use Cuda. Cuda is not supported for Windows Runtime.
 ...
 
-## Build CompanionWinRTWrapper
+## Build CompanionWinRT
 
-Simply use cmake or cmake-gui to build CompanionWinRTWrapper for your platform.
+Simply use cmake or cmake-gui to build CompanionWinRT for your platform.
 
 # Getting started
 
@@ -32,7 +32,7 @@ clicking on the project name and choose ```Add``` > ```Existing Item...```
 ...
 
 
-# Known Bugs
+# Known Issues
 * The sample app is currently only working when using the debug build.
 
 ### License
