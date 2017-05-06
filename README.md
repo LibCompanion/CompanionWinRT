@@ -31,6 +31,7 @@ Feel free to use the provided sample app as a starting point. Unfortunately CMak
 
 # License
 
+```
 This program is a Windows Runtime wrapper for the Companion CV library.
             https://github.com/LibCompanion/libCompanion
 
@@ -48,3 +49,4 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```
