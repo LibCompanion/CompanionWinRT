@@ -44,11 +44,6 @@ namespace CompanionUWPSample
         private String assetPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + "\\Assets";
 
         /**
-         * The path to the temp folder of this app to store temporary data.
-         */
-        private String tempPath = ApplicationData.Current.TemporaryFolder.Path;
-
-        /**
          * The path to the image folder that is used as an input source for the Companion processing example.
          */
         private String imageFolderPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + "\\Assets\\Muelheim_HBF";
