@@ -128,6 +128,21 @@ namespace CompanionWinRT
              */
             Companion::Configuration configurationObj;
 
+            /**
+             * A handle to the 'ObjectDetection' wrapper object.
+             */
+            ObjectDetection^ detection;
+
+            /**
+             * A handle to the 'ImageStream' wrapper object.
+             */
+            ImageStream^ stream;
+
+            /**
+             * A collection of all feature matching models.
+             */
+            std::vector<FeatureMatchingModel^> models;
+
             /*********************************************************************************************************
              * Raw pixel data (bytes) of the WritableBitmap that represents the companion output ont the UI thread.
              *********************************************************************************************************/

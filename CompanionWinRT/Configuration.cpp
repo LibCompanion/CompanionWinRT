@@ -57,6 +57,7 @@ Configuration::Configuration()
 
 void Configuration::setProcessing(ObjectDetection^ detection)
 {
+    this->detection = detection;
     this->configurationObj.setProcessing(this->detection->getProcessing(&this->configurationObj));
 }
 
@@ -82,11 +83,13 @@ void Configuration::setPixelBuffer(IBuffer^ pixelBuffer)
 
 void Configuration::setSource(ImageStream^ stream)
 {
+    this->stream = stream;
     this->configurationObj.setSource(this->stream->getStream());
 }
 
 void Configuration::addModel(FeatureMatchingModel^ model)
 {
+    this->models.push_back(model);
     if (!this->configurationObj.addModel(model->getModel()))
     {
         int hresult = static_cast<int>(ErrorCode::model_not_added);

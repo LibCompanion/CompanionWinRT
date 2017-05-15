@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <opencv2\imgcodecs\imgcodecs.hpp>
+
 #include <companion\model\FeatureMatchingModel.h>
 
 namespace CompanionWinRT
@@ -55,6 +57,11 @@ namespace CompanionWinRT
          * The native 'FeatureMatchingModel' object of this instance.
          */
         Companion::Model::FeatureMatchingModel* featureMatchingModelObj;
+
+        /**
+         * The native 'cv:Mat' object of this model.
+         */
+        cv::Mat imageModel;
 
     internal:
 

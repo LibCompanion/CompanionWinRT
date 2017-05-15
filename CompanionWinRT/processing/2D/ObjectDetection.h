@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <companion\Companion.h>
+#include <companion\Configuration.h>
 #include <companion\processing\2D\ObjectDetection.h>
 
 #include "..\..\algo\CPUFeatureMatching.h"
