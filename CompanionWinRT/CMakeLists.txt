@@ -31,9 +31,9 @@ target_link_libraries(CompanionWinRT Companion)
 
 
 # add install instructions
-install(TARGETS CompanionWinRT EXPORT CompanionWinRTWrapperConfig
+install(TARGETS CompanionWinRT EXPORT CompanionWinRTConfig
         RUNTIME DESTINATION "bin"
         LIBRARY DESTINATION "lib"
         ARCHIVE DESTINATION "lib")
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h")
-install(EXPORT CompanionWinRTWrapperConfig DESTINATION "lib")
+install(EXPORT CompanionWinRTConfig DESTINATION "lib")
