@@ -57,11 +57,6 @@ namespace CompanionWinRT
             Configuration();
 
             /**
-             * Destructs this instance.
-             */
-            virtual ~Configuration();
-
-            /**
              * Sets the image processing configuration.
              *
              * Note:
@@ -69,14 +64,14 @@ namespace CompanionWinRT
              * plausible abstract class 'ImageProcessing' for this wrapper. This is a minum construct and has to be
              * further developed to provide the same flexability as the Companion native DLL.
              */
-            IAsyncAction^ setProcessing(ObjectDetection^ detection);
+            void setProcessing(ObjectDetection^ detection);
 
             /**
              * Sets the number of frames to skip.
              *
              * @param skipFrame number of frames which should be skipped after one image processing cycle
              */
-            IAsyncAction^ setSkipFrame(int skipFrame);
+            void setSkipFrame(int skipFrame);
 
             /**
              * Sets the source.
@@ -86,19 +81,24 @@ namespace CompanionWinRT
              * plausible abstract class 'Stream' for this wrapper. This is a minum construct and has to be
              * further developed to provide the same flexability as the Companion native DLL.
              */
-            IAsyncAction^ setSource(ImageStream^ stream);
+            void setSource(ImageStream^ stream);
 
             /**
              * Adds a 'FeatureMatchingModel' object to this companion configuration.
              *
              * @param model feature matching model that is going to be added to this companion configuration
              */
-            IAsyncAction^ addModel(FeatureMatchingModel^ model);
+            void addModel(FeatureMatchingModel^ model);
 
             /**
              * Starts processing of the Companion library.
              */
-            IAsyncAction^ run();
+            void run();
+
+            /**
+             * Stops processing of the Companion library.
+             */
+            void stop();
 
             /**
              * Static event to update a listener that a new image is available.
@@ -115,12 +115,18 @@ namespace CompanionWinRT
 
             //static Platform::String^ loadVideo(Platform::String^ videoPath);
 
+            /**
+             * Returns the skip frame rate.
+             * @return number of frames that are skipped after each processed frame
+             */
+            int getSkipFrame();
+
         private:
         
             /**
              * The native 'Configuration' object of this instance.
              */
-            Companion::Configuration* configurationObj;
+            Companion::Configuration configurationObj;
 
             /*********************************************************************************************************
              * Raw pixel data (bytes) of the WritableBitmap that represents the companion output ont the UI thread.

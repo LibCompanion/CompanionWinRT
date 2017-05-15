@@ -39,14 +39,14 @@ namespace CompanionUWPSample
     public sealed partial class MainPage : Page
     {
         /**
-         * The path to the assets folder of this app (read only).
+         * A reference to the 'Assets' folder of this app (read only).
          */
-        private String assetPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + "\\Assets";
+        private StorageFolder assets;
 
         /**
-         * The path to the image folder that is used as an input source for the Companion processing example.
+         * A reference to the image samples folder that is used as an input source for the Companion processing example.
          */
-        private String imageFolderPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + "\\Assets\\Muelheim_HBF";
+        private StorageFolder imageFolder;
 
         /**
          * Cached working item on working thread so it can be cancled by the user.
@@ -64,6 +64,16 @@ namespace CompanionUWPSample
         private bool isRunning;
 
         /**
+         * States whether it's save to start companion.
+         */
+        private bool isReady;
+
+        /**
+         * A 'Configuration' wrapper object to provide configuration data to the companion cv library.
+         */
+        private CW.Configuration configuration;
+
+        /**
          * Constructs this main page.
          */
         public MainPage()
@@ -71,57 +81,74 @@ namespace CompanionUWPSample
             this.InitializeComponent();
             Reset();
             this.isRunning = false;
+            this.isReady = false;
         }
 
         /**
-         * Set an initial image file and create the WritableBitmap that is going to be the destination for the companion processing output.
+         * Set an initial image file and create the 'WritableBitmap' that is going to be the destination for the companion processing output.
          * 
          * ToDo: Examine why this is not working properly after the button click. This should not be done here with an image that is not
          * directly from the source.
+         * 
+         * @param e navigation event data
          */
         async protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            // Initialize the 'Assets' folder
             try
             {
-                // Get the size of the images for the WriteableBitmap constructor.
-                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(this.imageFolderPath);
-                IReadOnlyList<StorageFile> fileList = await folder.GetFilesAsync();
+                this.assets = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
+            }
+            catch (System.IO.FileNotFoundException ex)
+            {
+                this.UpdateUIOutput("No 'Assets' folder found.");
+                return;
+            }
+
+            // Initialize the image source folder
+            try
+            {
+                this.imageFolder = await this.assets.GetFolderAsync("Muelheim_HBF");
+            }
+            catch (System.IO.FileNotFoundException ex)
+            {
+                this.UpdateUIOutput("No image source folder found.");
+                return;
+            }
+
+            // Get the size of the images for the WriteableBitmap constructor.
+            try
+            {
+                IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
                 StorageFile file = fileList[0];
                 ImageProperties props = await file.Properties.GetImagePropertiesAsync();
                 this.m_bm = new WriteableBitmap((int)props.Height, (int)props.Width);
                 m_bm.SetSource(await file.OpenReadAsync());
                 this.image.Source = m_bm;
+                this.isReady = true;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                UpdateUIOutput("Image source not found.");
+                this.UpdateUIOutput("Image sources not found.");
             }
         }
 
         /**
          * Start a Companion creation and configuration on button click.
+         * 
+         * @param sender    sender of the event
+         * @param e         routed event data
          */
         private async void startButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!this.isRunning)
+            if (!this.isRunning && isReady)
             {
                 this.isRunning = true;
 
                 try
                 {
                     // Create a configuration object of the Companion library
-                    CW.Configuration configuration = await this.CreateConfiguration();
-
-                    // Configure image recognition
-                    CW.CPUFeatureMatching feature = await this.CreateCPUFeatureMatching(CW.CPUFeatureDetector.BRISK,
-                        CW.DescriptorMatcher.BRUTEFORCE_HAMMING);
-
-                    // Configure image processing
-                    CW.ObjectDetection objectDetection = await this.CreateObjectDetection(feature);
-                    await configuration.setProcessing(objectDetection);
-
-                    // Set number of frames to skip (only video???)
-                    await configuration.setSkipFrame(40);
+                    await this.CreateConfiguration();
 
                     // Create a WritableBitmap as the output destination for Companion
                     //this.CreateBitmap(new Uri(this.imageSourceURI, "Muelheim_HBF 001.jpg"));
@@ -135,22 +162,9 @@ namespace CompanionUWPSample
                         this.m_bm.Invalidate();
                     };
 
-                    // Set input source (image folder because video source is not supported right now)
-                    CW.ImageStream stream = await this.CreateImageStream(this.imageFolderPath);
-                    await configuration.setSource(stream);
-
-                    // Create feature matching models
-                    CW.FeatureMatchingModel model1 = await this.CreateFeatureMatchingModel(this.assetPath + "\\Sample_Left.jpg");
-                    CW.FeatureMatchingModel model2 = await this.CreateFeatureMatchingModel(this.assetPath + "\\Sample_Middle.jpg");
-                    CW.FeatureMatchingModel model3 = await this.CreateFeatureMatchingModel(this.assetPath + "\\Sample_Right.jpg");
-
-                    // Add feature matching models
-                    await configuration.addModel(model1);
-                    await configuration.addModel(model2);
-                    await configuration.addModel(model3);
 
                     // Run Companion on a background thread
-                    await configuration.run();
+                    await this.RunCompanion();
 
                     // A reference to the work item is cached so that we can trigger a cancellation when the user presses the Cancel button.
                     //this.m_workItem = Windows.System.Threading.ThreadPool.RunAsync((workItem) =>
@@ -175,7 +189,7 @@ namespace CompanionUWPSample
                     //    // Update the UI thread with the CoreDispatcher.
                     //    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.High, new DispatchedHandler(() =>
                     //    {
-                    //        UpdateUIOutput("WORKER THREAD GESCHLOSSEN!");
+                    //        this.UpdateUIOutput("WORKER THREAD GESCHLOSSEN!");
                     //    }));
                     //});
 
@@ -184,10 +198,8 @@ namespace CompanionUWPSample
                 {
                     this.handleException(ex);
                 }
-
-                this.isRunning = false;
             }
-            else
+            else if (this.isReady)
             {
                 this.UpdateUIOutput("Processing has already started.");
             }
@@ -195,91 +207,117 @@ namespace CompanionUWPSample
 
         /**
          * Cancel the companion processing.
+         * 
+         * @param sender    sender of the event
+         * @param e         routed event data
          */
-        private void cancelButton_Click(object sender, RoutedEventArgs e)
+        private async void cancelButton_Click(object sender, RoutedEventArgs e)
         {
-            // ToDo
-            this.UpdateUIOutput("Cancelation is currently not supported.");
-        }
-
-        /**
-         * Creates a Companion/Configuration wrapper object.
-         */
-        private IAsyncOperation<CW.Configuration> CreateConfiguration()
-        {
-            return Task.Run(() =>
+            if (this.isRunning)
             {
-                return new CW.Configuration();
-            }).AsAsyncOperation<CW.Configuration>();
+                try
+                {
+                    await this.StopCompanion();
+                    this.UpdateUIOutput("Processing has been stopped.");
+                    this.isRunning = false;
+                }
+                catch (Exception ex)
+                {
+                    this.handleException(ex);
+                }
+            }
         }
 
         /**
-         * Creates a CPUFeatureMatching wrapper object.
+         * Creates a 'Configuration' wrapper object.
+         * 
+         * @return Returns a 'Configuration' wrapper object asynchronously.
          */
-        private IAsyncOperation<CW.CPUFeatureMatching> CreateCPUFeatureMatching(CW.CPUFeatureDetector detector, CW.DescriptorMatcher matcher)
-        {
-            return Task.Run(() =>
-            {
-                return new CW.CPUFeatureMatching(detector, matcher);
-            }).AsAsyncOperation<CW.CPUFeatureMatching>();
-        }
-
-        /**
-         * Creates an ObjectDetection wrapper object.
-         */
-        private IAsyncOperation<CW.ObjectDetection> CreateObjectDetection(CW.CPUFeatureMatching feature)
-        {
-            return Task.Run(() =>
-            {
-                return new CW.ObjectDetection(feature);
-            }).AsAsyncOperation<CW.ObjectDetection>();
-        }
-
-        /**
-         * Creates an ImageStream wrapper object.
-         */
-        private IAsyncOperation<CW.ImageStream> CreateImageStream(String folderPath)
+        private IAsyncAction CreateConfiguration()
         {
             return Task.Run(async () =>
             {
-                // Retrieve images form the provided image folder
-                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(folderPath);
+                this.configuration = new CW.Configuration();
 
-                // Save the image paths to a list for the 'ImageStream' object
-                List<String> imagePathList;
-                if (folder != null)
+                // Configure image recognition
+                CW.CPUFeatureMatching feature = new CW.CPUFeatureMatching(CW.CPUFeatureDetector.BRISK, CW.DescriptorMatcher.BRUTEFORCE_HAMMING);
+
+                // Configure image processing
+                CW.ObjectDetection objectDetection = new CW.ObjectDetection(feature);
+                this.configuration.setProcessing(objectDetection);
+
+                // Set number of frames to skip
+                this.configuration.setSkipFrame(0);
+
+
+
+                /**********************************************************************************
+                 * Set input source (image folder because video source is not supported right now)
+                 **********************************************************************************/
+
+                // Save the source image paths to a list for the 'ImageStream' object
+                List<String> imagePathList = new List<String>();
+                IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
+                foreach (StorageFile file in fileList)
                 {
-                    imagePathList = new List<String>();
-                    IReadOnlyList<StorageFile> fileList = await folder.GetFilesAsync();
-                    foreach (StorageFile file in fileList)
-                    {
-                        imagePathList.Add(file.Path);
-                    }
-                }
-                else
-                {
-                    throw new Exception("The folder does not exist.");
+                    imagePathList.Add(file.Path);
                 }
 
-                return new CW.ImageStream(imagePathList);
+                // Add source to configuaration
+                CW.ImageStream stream = new CW.ImageStream(imagePathList);
+                this.configuration.setSource(stream);
 
-            }).AsAsyncOperation<CW.ImageStream>();
+
+
+                /**********************************************************
+                 * Create and add feature matching models to configuration
+                 **********************************************************/
+
+                // Create feature matching models
+                CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Left.jpg");
+                CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Middle.jpg");
+                CW.FeatureMatchingModel model3 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Right.jpg");
+
+                // Add feature matching models
+                this.configuration.addModel(model1);
+                this.configuration.addModel(model2);
+                this.configuration.addModel(model3);
+
+            }).AsAsyncAction();
         }
 
         /**
-         * Creates and a 'FeatureMatchingModel' wrapper object from the provided image.
+         * Starts the companion processing with the provided 'Configuration' wrapper object.
+         * 
+         * @param config    a 'Configuration' wrapper object
+         * @return Returns a awaitable asynchronous action.
          */
-        private IAsyncOperation<CW.FeatureMatchingModel> CreateFeatureMatchingModel(String imagePath)
+        private IAsyncAction RunCompanion()
         {
             return Task.Run(() =>
             {
-                return new CW.FeatureMatchingModel(imagePath);
+                this.configuration.run();
+            }).AsAsyncAction();
+        }
 
-            }).AsAsyncOperation<CW.FeatureMatchingModel>();
+        /**
+         * Stops the companion processing.
+         * 
+         * @param config    a 'Configuration' wrapper object
+         * @return Returns a awaitable asynchronous action.
+         */
+        private IAsyncAction StopCompanion()
+        {
+            return Task.Run(() =>
+            {
+                this.configuration.stop();
+            }).AsAsyncAction();
         }
 
         /**
          * Handles Companion exceptions and prints corresponding error messages.
+         * 
+         * @param ex    exception that was thrown
          */
         private void handleException(Exception ex)
         {
@@ -301,6 +339,8 @@ namespace CompanionUWPSample
 
         /**
          * Update UI output.
+         * 
+         * @param s message that should be displayed for the user
          */
         private void UpdateUIOutput(String s)
         {
