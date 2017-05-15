@@ -52,7 +52,7 @@ namespace CompanionWinRT
         public:
 
             /**
-             * Creates an 'Companion/Configuration' wrapper.
+             * Creates an 'Configuration' wrapper.
              */
             Configuration();
 
@@ -118,19 +118,19 @@ namespace CompanionWinRT
         private:
         
             /**
-             * The native 'Companion/Configuration' object of this instance.
+             * The native 'Configuration' object of this instance.
              */
             Companion::Configuration* configurationObj;
 
             /*********************************************************************************************************
-            * Raw pixel data (bytes) of the WritableBitmap that represents the companion output ont the UI thread.
-            *********************************************************************************************************/
+             * Raw pixel data (bytes) of the WritableBitmap that represents the companion output ont the UI thread.
+             *********************************************************************************************************/
             static uint8* pixels;
 
             /*********************************************************************************************************
-            * Static dispatcher that is responsible to dispathc the triggered 'featuresFoundEvent' to get delivered
-            * to the right thread (in this current context that is the UI thread).
-            *********************************************************************************************************/
+             * Static dispatcher that is responsible to dispathc the triggered 'featuresFoundEvent' to get delivered
+             * to the right thread (in this current context that is the UI thread).
+             *********************************************************************************************************/
             static CoreDispatcher^ dispatcher;
 
             /**

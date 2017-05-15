@@ -129,7 +129,7 @@ namespace CompanionWinRT
                         error = "The handle to the CPUFeatureMatching object is null.";
                         break;
                     case ErrorCode::config_or_recognition_not_found :
-                        error = "At least one of the provided pointers/handles to the 'Companion/Configuration' and 'CPUFeatureMatching' objects is null.";
+                        error = "At least one of the provided pointers/handles to the 'Configuration' and 'CPUFeatureMatching' objects is null.";
                         break;
                     case ErrorCode::objectdetection_not_found :
                         error = "The handle that points to the 'ObjectDetection' objects is null.";
