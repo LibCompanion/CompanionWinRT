@@ -26,9 +26,6 @@ Feel free to use the provided sample app as a starting point. Unfortunately CMak
 5. Add your own image samples and an image source folder to the project assets (video as a source is not supported at the moment)
 6. Add your OpenCV-DLLs to the project by right clicking on `CompanionUWPSample` and choosing `Add` > `Existing Item...`
 
-# Known Issues
-* Currently the sample app is only working when using the debug build.
-
 # License
 
 ```
