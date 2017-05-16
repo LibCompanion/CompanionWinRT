@@ -21,8 +21,6 @@
 #include "FeatureMatchingModel.h"
 #include "..\utils\CompanionError.h"
 
-#include <opencv2\imgcodecs\imgcodecs.hpp>
-
 using namespace CompanionWinRT;
 
 FeatureMatchingModel::FeatureMatchingModel(Platform::String^ imagePath)
@@ -30,7 +28,8 @@ FeatureMatchingModel::FeatureMatchingModel(Platform::String^ imagePath)
     if (imagePath != nullptr)
     {
         this->featureMatchingModelObj = new Companion::Model::FeatureMatchingModel();
-        this->featureMatchingModelObj->setImage(cv::imread(ps2ss(imagePath), cv::IMREAD_GRAYSCALE)); // ToDO: should the user be able to change IMREAD value?
+        this->imageModel = cv::imread(ps2ss(imagePath), cv::IMREAD_GRAYSCALE); // ToDO: should the user be able to change IMREAD value?
+        this->featureMatchingModelObj->setImage(this->imageModel);
         
         /* ToDo for wrapper: construct 'FeatureMatchingModel' with a reference to 'CPUFeatureMatching' */
         // Only works on CPU -- ToDo Exception Handling if wrong type?

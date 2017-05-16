@@ -42,40 +42,35 @@ CoreDispatcher^ Configuration::dispatcher = nullptr;
 
 Configuration::Configuration()
 {
-    this->configurationObj = new Companion::Configuration();
-
     // Define callback functions
     //std::function<void(std::vector<Companion::Draw::Drawable*>, cv::Mat)> callback = std::bind(&CallbackWrapper::callback, this->callbackWrapper, std::placeholders::_1, std::placeholders::_2);
     //std::function<void(std::vector<Companion::Draw::Drawable*>, cv::Mat)> callback = std::bind(&Configuration::callback, this, std::placeholders::_1, std::placeholders::_2);
-    this->configurationObj->setResultHandler(Configuration::callback);
+    this->configurationObj.setResultHandler(Configuration::callback);
     //std::function<void(Companion::Error::Code)> error = std::bind(&Configuration::error, this, std::placeholders::_1);
-    this->configurationObj->setErrorHandler(Configuration::error);
-}
-
-Configuration::~Configuration()
-{
-    delete this->configurationObj;
-    this->configurationObj = nullptr;
-}
-
-IAsyncAction^ Configuration::setProcessing(ObjectDetection^ detection)
-{
-    return create_async([this, detection]()
+    //this->configurationObj.setErrorHandler(Configuration::error);
+    this->configurationObj.setErrorHandler([](Companion::Error::Code code)
     {
-        this->configurationObj->setProcessing(detection->getProcessing(this->configurationObj));
+        int hresult = static_cast<int>(getErrorCode(code));
+        throw ref new Platform::Exception(hresult);
     });
 }
 
-IAsyncAction^ Configuration::setSkipFrame(int skipFrame)
+void Configuration::setProcessing(ObjectDetection^ detection)
 {
-    return create_async([this, skipFrame]()
-    {
-        this->configurationObj->setSkipFrame(0);
-    });
+    this->detection = detection;
+    this->configurationObj.setProcessing(this->detection->getProcessing(&this->configurationObj));
+}
+
+void Configuration::setSkipFrame(int skipFrame)
+{
+    this->configurationObj.setSkipFrame(skipFrame);
 }
 
 void Configuration::setPixelBuffer(IBuffer^ pixelBuffer)
 {
+    // Define dispatcher for the UI thread
+    Configuration::dispatcher = CoreWindow::GetForCurrentThread()->Dispatcher;
+
     // Query the IBufferByteAccess interface.  
     Microsoft::WRL::ComPtr<IBufferByteAccess> bufferByteAccess;
     reinterpret_cast<IInspectable*>(pixelBuffer)->QueryInterface(IID_PPV_ARGS(&bufferByteAccess));
@@ -86,47 +81,56 @@ void Configuration::setPixelBuffer(IBuffer^ pixelBuffer)
     Configuration::pixels = pixels;
 }
 
-IAsyncAction^ Configuration::setSource(ImageStream^ stream)
+void Configuration::setSource(ImageStream^ stream)
 {
-    return create_async([this, stream]()
-    {
-        this->configurationObj->setSource(stream->getStream());
-    });
+    this->stream = stream;
+    this->configurationObj.setSource(this->stream->getStream());
 }
 
-IAsyncAction^ Configuration::addModel(FeatureMatchingModel^ model)
+void Configuration::addModel(FeatureMatchingModel^ model)
 {
-    return create_async([this, model]()
+    this->models.push_back(model);
+    if (!this->configurationObj.addModel(model->getModel()))
     {
-        if (!this->configurationObj->addModel(model->getModel()))
-        {
-            int hresult = static_cast<int>(ErrorCode::model_not_added);
-            throw ref new Platform::Exception(hresult);
-        }
-    });
+        int hresult = static_cast<int>(ErrorCode::model_not_added);
+        throw ref new Platform::Exception(hresult);
+    }
 }
 
-IAsyncAction^ Configuration::run()
+void Configuration::run()
 {
-    // Define dispatcher for the UI thread
-    Configuration::dispatcher = CoreWindow::GetForCurrentThread()->Dispatcher;
+    // Test
+    Configuration::getDataEvent += ref new GetDataDelegate(this, &Configuration::GetDataImpl2);
 
-    return create_async([this]()
+    // Create StreamWorker
+    std::queue<cv::Mat> queue;
+    Companion::Thread::StreamWorker ps(queue);
+
+    try
     {
-        std::queue<cv::Mat>* queue = new std::queue<cv::Mat>();
-        Companion::Thread::StreamWorker* ps = new Companion::Thread::StreamWorker(*queue);
+        this->configurationObj.run(ps);
+    }
+    catch (Companion::Error::Code errorCode)
+    {
+        Configuration::error(errorCode);
+    }
+}
 
-        Configuration::getDataEvent += ref new GetDataDelegate(this, &Configuration::GetDataImpl2);
+void Configuration::stop()
+{
+    try
+    {
+        this->configurationObj.stop();
+    }
+    catch (Companion::Error::Code errorCode)
+    {
+        Configuration::error(errorCode);
+    }
+}
 
-        try
-        {
-            this->configurationObj->run(*ps);
-        }
-        catch (Companion::Error::Code errorCode)
-        {
-            Configuration::error(errorCode);
-        }
-    });
+int Configuration::getSkipFrame()
+{
+    return this->configurationObj.getSkipFrame();
 }
 
 /* Videos as source are not supported right now. You have to build FFMpeg for OpenCV and WinRT.
@@ -162,6 +166,7 @@ void Configuration::error(Companion::Error::Code code)
 
 void Configuration::callback(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame)
 {
+    // Draw found objects onto the frame
     Companion::Draw::Drawable *drawable;
 
     for (int x = 0; x < objects.size(); x++)
@@ -224,6 +229,7 @@ void Configuration::GetDataImpl(std::vector<Companion::Draw::Drawable*> objects,
 
 void Configuration::GetDataImpl2(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame)
 {
+    // Draw found objects onto the frame
     Companion::Draw::Drawable *drawable;
 
     for (int x = 0; x < objects.size(); x++)

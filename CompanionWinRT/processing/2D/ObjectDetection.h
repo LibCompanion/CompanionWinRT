@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <companion\Companion.h>
+#include <companion\Configuration.h>
 #include <companion\processing\2D\ObjectDetection.h>
 
 #include "..\..\algo\CPUFeatureMatching.h"
@@ -41,81 +41,81 @@ namespace CompanionWinRT
      */
     public ref class ObjectDetection sealed
     {
-        public:
+    public:
 
-            /**
-             * Creates an 'ObjectDetection' wrapper with the provided feature matching algorithm.
-             *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageProcessing' for this wrapper. To avoid circular dependencies (includes)
-             * the companion/configuration reference has to be provided natively inside the 'Configuration' wrapper.
-             *
-             * ToDo:
-             * User should be able to choose between different image recognition algorithms. This is a minimum construction.
-             *
-             * @param feature       Image recognition algorithm to use, for example feature matching.
-             */
-            ObjectDetection(CPUFeatureMatching^ feature) : ObjectDetection(feature, 0.5F)
-            {};
+        /**
+         * Creates an 'ObjectDetection' wrapper with the provided feature matching algorithm.
+         *
+         * Note:
+         * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
+         * plausible abstract class 'ImageProcessing' for this wrapper. To avoid circular dependencies (includes)
+         * the configuration reference has to be provided natively inside the 'Configuration' wrapper.
+         *
+         * ToDo:
+         * User should be able to choose between different image recognition algorithms. This is a minimum construction.
+         *
+         * @param feature       Image recognition algorithm to use, for example feature matching.
+         */
+        ObjectDetection(CPUFeatureMatching^ feature) : ObjectDetection(feature, 0.5F)
+        {};
 
-            /**
-             * Creates an 'ObjectDetection' wrapper with the provided feature matching algorithm.
-             *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageProcessing' for this wrapper. To avoid circular dependencies (includes)
-             * the companion/configuration reference has to be provided natively inside the 'Configuration' wrapper.
-             *
-             * ToDo:
-             * User should be able to choose between different image recognition algorithms. This is a minimum construction.
-             *
-             * @param feature       Image recognition algorithm to use, for example feature matching.
-             * @param scale         scaling factor of frames
-             */
-            ObjectDetection(CPUFeatureMatching^ feature, float scale);
+        /**
+         * Creates an 'ObjectDetection' wrapper with the provided feature matching algorithm.
+         *
+         * Note:
+         * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
+         * plausible abstract class 'ImageProcessing' for this wrapper. To avoid circular dependencies (includes)
+         * the configuration reference has to be provided natively inside the 'Configuration' wrapper.
+         *
+         * ToDo:
+         * User should be able to choose between different image recognition algorithms. This is a minimum construction.
+         *
+         * @param feature       Image recognition algorithm to use, for example feature matching.
+         * @param scale         scaling factor of frames
+         */
+        ObjectDetection(CPUFeatureMatching^ feature, float scale);
 
-            /**
-             * Destructs this instance.
-             */
-            virtual ~ObjectDetection();
+        /**
+         * Destructs this instance.
+         */
+        virtual ~ObjectDetection();
 
-        private:
+    private:
 
-            /**
-             * The native 'ObjectDetection' object of this instance.
-             */
-            Companion::Processing::ObjectDetection* objectDetectionObj;
+        /**
+         * The native 'ObjectDetection' object of this instance.
+         */
+        Companion::Processing::ObjectDetection* objectDetectionObj;
 
-            /**
-             * A handle to the desired image recognition algorithm.
-             *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageProcessing' for this wrapper.
-             *
-             * ToDo:
-             * User should be able to choose between different image recognition algorithms. This is a minimum construction.
-             */
-            CPUFeatureMatching^ feature;
+        /**
+         * A handle to the desired image recognition algorithm.
+         *
+         * Note:
+         * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
+         * plausible abstract class 'ImageProcessing' for this wrapper.
+         *
+         * ToDo:
+         * User should be able to choose between different image recognition algorithms. This is a minimum construction.
+         */
+        CPUFeatureMatching^ feature;
 
-            /**
-             * Scaling factor for frames.
-             */
-            float scale;
+        /**
+         * Scaling factor for frames.
+         */
+        float scale;
 
-        internal:
+    internal:
 
-            /**
-             * Internal method to provide the native 'ImageProcessing' object (in this case a 'ObjectDetection' object).
-             *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageProcessing' for this wrapper. To avoid circular dependencies (includes)
-             * the companion/configuration reference has to be provided natively inside the 'Configuration' wrapper.
-             *
-             * @return Pointer to the native 'ImageProcessing' object
-             */
-            Companion::Processing::ImageProcessing* getProcessing(Companion::Configuration* configuration);
+        /**
+         * Internal method to provide the native 'ImageProcessing' object (in this case a 'ObjectDetection' object).
+         *
+         * Note:
+         * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
+         * plausible abstract class 'ImageProcessing' for this wrapper. To avoid circular dependencies (includes)
+         * the configuration reference has to be provided natively inside the 'Configuration' wrapper.
+         *
+         * @return Pointer to the native 'ImageProcessing' object
+         */
+        Companion::Processing::ImageProcessing* getProcessing(Companion::Configuration* configuration);
     };
 }

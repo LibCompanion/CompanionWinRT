@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <opencv2\imgcodecs\imgcodecs.hpp>
+
 #include <companion\model\FeatureMatchingModel.h>
 
 namespace CompanionWinRT
@@ -35,7 +37,7 @@ namespace CompanionWinRT
      */
     public ref class FeatureMatchingModel sealed
     {
-        public:
+    public:
 
         /**
          * Creates an 'FeatureMatchingModel' wrapper with the provided image path.
@@ -49,14 +51,19 @@ namespace CompanionWinRT
          */
         virtual ~FeatureMatchingModel();
 
-        private:
+    private:
 
         /**
          * The native 'FeatureMatchingModel' object of this instance.
          */
         Companion::Model::FeatureMatchingModel* featureMatchingModelObj;
 
-        internal:
+        /**
+         * The native 'cv:Mat' object of this model.
+         */
+        cv::Mat imageModel;
+
+    internal:
 
         /**
          * Internal method to provide the native 'ImageRecognitionModel' object (in this case an 'FeatureMatchingModel' object).
