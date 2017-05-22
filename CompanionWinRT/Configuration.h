@@ -20,44 +20,41 @@
 
 #pragma once
 
-#include <collection.h>
-
 #include "processing\2D\ObjectDetection.h"
 #include "input\ImageStream.h"
 #include "model\FeatureMatchingModel.h"
-
-using namespace Platform::Collections;
-using namespace Windows::Foundation;
-using namespace Windows::UI::Core;
-using namespace Windows::Storage::Streams;
+#include "draw\Frame.h"
 
 namespace CompanionWinRT
 {
     /**
-     * Delegate for the 'featuresFoundEvent' to update a listener that a new image is available.
+     * A delegate that defines a result callback function for the client app.
+     *
+     * @param frames    vector of 'Frame' object references that represent the detected objects
+     * @param image     byte array reference of the processed image 
      */
-    public delegate void FeaturesFoundHandler();
-    
-    /* Test */
-    private delegate void GetDataDelegate(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame);
+    public delegate void ResultDelegate(IVector<Frame^>^ frames, const Platform::Array<uint8>^ image);
+
+    /**
+     * A delegate that defines an error callback function for the client app.
+     *
+     * @param errorMessage  a message to describe the error
+     */
+    public delegate void ErrorDelegate(Platform::String^ errorMessage);
 
     /**
      * This class provides WinRT compatible functionality wrapped around the Companion project code.
      *
      * @author Dimitri Kotlovsky
      */
-    [Windows::Foundation::Metadata::WebHostHidden]
     public ref class Configuration sealed
     {
         public:
 
             /**
-             * Creates an 'Configuration' wrapper.
-             */
-            Configuration();
-
-            /**
              * Sets the image processing configuration.
+             *
+             * @param detection an object detection configuration for this companion configuration
              *
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
@@ -65,6 +62,20 @@ namespace CompanionWinRT
              * further developed to provide the same flexability as the Companion native DLL.
              */
             void setProcessing(ObjectDetection^ detection);
+
+            /**
+             * Sets a function as a result callback for the companion processing.
+             *
+             * @param callback  a concrete function that works as a callback for the processing result
+             */
+            void setResultCallback(ResultDelegate^ callback);
+
+            /**
+             * Sets a function as an error callback for the companion processing.
+             *
+             * @param callback  a concrete function that works as an error callback
+             */
+            void setErrorCallback(ErrorDelegate^ callback);
 
             /**
              * Sets the number of frames to skip.
@@ -76,6 +87,8 @@ namespace CompanionWinRT
             /**
              * Sets the source.
              *
+             * @param stream    an image stream as the processing source
+             *
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
              * plausible abstract class 'Stream' for this wrapper. This is a minum construct and has to be
@@ -86,7 +99,7 @@ namespace CompanionWinRT
             /**
              * Adds a 'FeatureMatchingModel' object to this companion configuration.
              *
-             * @param model feature matching model that is going to be added to this companion configuration
+             * @param model a feature matching model for this companion configuration
              */
             void addModel(FeatureMatchingModel^ model);
 
@@ -101,28 +114,24 @@ namespace CompanionWinRT
             void stop();
 
             /**
-             * Static event to update a listener that a new image is available.
-             */
-            static event FeaturesFoundHandler^ featuresFoundEvent;
-
-            /*********************************************************************************************************
-             * Retrieves the raw pixel data from the provided IBuffer object of a WritableBitmap (UI thread required).
-             * The mutable bytes are used to update image information as the output of the companion processing.
-             *
-             * @param pixelBuffer   Buffer of a WritableBitmap that includes the mutable bytes for companion output
-             *********************************************************************************************************/
-            static void setPixelBuffer(IBuffer^ pixelBuffer);
-
-            //static Platform::String^ loadVideo(Platform::String^ videoPath);
-
-            /**
              * Returns the skip frame rate.
+             *
              * @return number of frames that are skipped after each processed frame
              */
             int getSkipFrame();
 
         private:
-        
+
+            /**
+             * Reference o a concrete result callback function.
+             */
+            ResultDelegate^ resultDelegate;
+
+            /**
+             * Rreference o a concrete error callback function.
+             */
+            ErrorDelegate^ errorDelegate;
+           
             /**
              * The native 'Configuration' object of this instance.
              */
@@ -142,36 +151,5 @@ namespace CompanionWinRT
              * A collection of all feature matching models.
              */
             std::vector<FeatureMatchingModel^> models;
-
-            /*********************************************************************************************************
-             * Raw pixel data (bytes) of the WritableBitmap that represents the companion output ont the UI thread.
-             *********************************************************************************************************/
-            static uint8* pixels;
-
-            /*********************************************************************************************************
-             * Static dispatcher that is responsible to dispathc the triggered 'featuresFoundEvent' to get delivered
-             * to the right thread (in this current context that is the UI thread).
-             *********************************************************************************************************/
-            static CoreDispatcher^ dispatcher;
-
-            /**
-             * Static callback function to obtain errors from companion processing.
-             *
-             * @param code  error code that represents the error
-             */
-            static void error(Companion::Error::Code code);
-
-            /**
-             * Static callback function to obtain results from companion processing.
-             *
-             * @param objects   drawable objects to represent the processing results in the image
-             * @param frame     actual image
-             */
-            static void callback(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame);
-
-            /* Test */
-            static void GetDataImpl(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame);
-            void GetDataImpl2(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame);
-            static event GetDataDelegate^ getDataEvent;
         };
 }

@@ -31,6 +31,9 @@ using System.Threading.Tasks;
 
 namespace CompanionUWPSample
 {
+    using System.IO;
+    using System.Runtime.InteropServices.WindowsRuntime;
+    using Windows.Storage.Streams;
     using CW = CompanionWinRT;
 
     /**
@@ -55,7 +58,7 @@ namespace CompanionUWPSample
 
         /**
          * Output destination for the obtained images from the companion library.
-         */ 
+         */
         private WriteableBitmap m_bm;
 
         /**
@@ -122,7 +125,7 @@ namespace CompanionUWPSample
                 IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
                 StorageFile file = fileList[0];
                 ImageProperties props = await file.Properties.GetImagePropertiesAsync();
-                this.m_bm = new WriteableBitmap((int)props.Height, (int)props.Width);
+                this.m_bm = new WriteableBitmap((int)props.Width, (int)props.Height);
                 m_bm.SetSource(await file.OpenReadAsync());
                 this.image.Source = m_bm;
                 this.isReady = true;
@@ -152,16 +155,6 @@ namespace CompanionUWPSample
 
                     // Create a WritableBitmap as the output destination for Companion
                     //this.CreateBitmap(new Uri(this.imageSourceURI, "Muelheim_HBF 001.jpg"));
-
-                    // Set pixel buffer of this App's WritableBitmap (has to be done on the UI thread)
-                    CW.Configuration.setPixelBuffer(this.m_bm.PixelBuffer);
-
-                    // Subscribe to event so the bitmap can be redrawn after the bytes have been replaced
-                    CW.Configuration.featuresFoundEvent += () =>
-                    {
-                        this.m_bm.Invalidate();
-                    };
-
 
                     // Run Companion on a background thread
                     await this.RunCompanion();
@@ -246,6 +239,10 @@ namespace CompanionUWPSample
                 CW.ObjectDetection objectDetection = new CW.ObjectDetection(feature);
                 this.configuration.setProcessing(objectDetection);
 
+                // Set callback methods
+                this.configuration.setResultCallback(this.ResultCallback);
+                this.configuration.setErrorCallback(this.ErrorCallback);
+
                 // Set number of frames to skip
                 this.configuration.setSkipFrame(0);
 
@@ -284,6 +281,52 @@ namespace CompanionUWPSample
                 this.configuration.addModel(model3);
 
             }).AsAsyncAction();
+        }
+
+        /**
+         * Result callback method for the companion processing.
+         * 
+         * @param frames    list of frames that mark a detected object
+         * @param image     the processed image with visually markers for the detected objects
+         */
+        public void ResultCallback(IList<CW.Frame> frames, byte[] image)
+        {
+            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
+            {
+                try
+                {
+                    using (Stream stream = this.m_bm.PixelBuffer.AsStream())
+                    {
+                        if (stream.CanWrite)
+                        {
+                            await stream.WriteAsync(image, 0, image.Length);
+                            stream.Flush();
+                        }
+                    }
+                    this.m_bm.Invalidate();
+                    if (frames.Count != 0)
+                    {
+                        this.UpdateUIOutput("x: " + frames[0].getUpperLeftCorner().x + ", y: " + frames[0].getUpperLeftCorner().y);
+                    }
+                } catch (Exception ex)
+                {
+                    this.UpdateUIOutput(ex.Message);
+                }
+                
+            });
+        }
+
+        /**
+         * Error callback method for the companion processing.
+         * 
+         * @param errorMessage  a specific error message
+         */
+        public void ErrorCallback(String errorMessage)
+        {
+            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                this.UpdateUIOutput(errorMessage);
+            });
         }
 
         /**

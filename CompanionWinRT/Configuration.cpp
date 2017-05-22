@@ -18,42 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <collection.h>
+
 #include "Configuration.h"
 #include "utils\CompanionError.h"
 
-#include <ppltasks.h>
-#include <Robuffer.h>
-
 using namespace CompanionWinRT;
-using namespace Concurrency;
-
-/**
- * Initialize static data members (because static data members must be explicitly defined in exactly one compilation unit).
- *
- * Note:
- * Another approach is to use GetDataDelegate/getDataEvent to throw a static event to a instance method. But it will be received
- * by all instances and it increases the overhead (should be further examined).
- */
-uint8* Configuration::pixels = nullptr;
-CoreDispatcher^ Configuration::dispatcher = nullptr;
-
-
-
-
-Configuration::Configuration()
-{
-    // Define callback functions
-    //std::function<void(std::vector<Companion::Draw::Drawable*>, cv::Mat)> callback = std::bind(&CallbackWrapper::callback, this->callbackWrapper, std::placeholders::_1, std::placeholders::_2);
-    //std::function<void(std::vector<Companion::Draw::Drawable*>, cv::Mat)> callback = std::bind(&Configuration::callback, this, std::placeholders::_1, std::placeholders::_2);
-    this->configurationObj.setResultHandler(Configuration::callback);
-    //std::function<void(Companion::Error::Code)> error = std::bind(&Configuration::error, this, std::placeholders::_1);
-    //this->configurationObj.setErrorHandler(Configuration::error);
-    this->configurationObj.setErrorHandler([](Companion::Error::Code code)
-    {
-        int hresult = static_cast<int>(getErrorCode(code));
-        throw ref new Platform::Exception(hresult);
-    });
-}
 
 void Configuration::setProcessing(ObjectDetection^ detection)
 {
@@ -61,24 +31,51 @@ void Configuration::setProcessing(ObjectDetection^ detection)
     this->configurationObj.setProcessing(this->detection->getProcessing(&this->configurationObj));
 }
 
+void Configuration::setResultCallback(ResultDelegate^ callback)
+{
+    this->configurationObj.setResultHandler([callback](std::vector<Companion::Draw::Drawable*> objects, cv::Mat image)
+    {
+        std::vector<Frame^> frames;
+        Companion::Draw::Drawable *drawable;
+
+        for (int x = 0; x < objects.size(); x++)
+        {
+            // Draw found objects onto the image
+            drawable = objects.at(x);
+            drawable->draw(image);
+
+            // Capsule the pixel data into ABI friendly 'Frame' objects
+            std::vector<Companion::Draw::Line*> lines = (static_cast<Companion::Draw::Lines*>(drawable))->getLines();
+            Frame^ frame = ref new Frame(lines.at(0)->getStart(), lines.at(0)->getEnd(), lines.at(3)->getStart(), lines.at(3)->getEnd());
+            frames.push_back(frame);
+        }
+
+        // Add alpha channel (required for WritableBitmap)
+        cv::Mat markedImage = cv::Mat(image.rows, image.cols, CV_8UC4);
+        cv::cvtColor(image, markedImage, CV_BGR2BGRA);
+
+        // Copy image data to a byte[] so it can be passed across the ABI
+        Platform::Array<uint8>^ imageData = ref new Platform::Array<uint8>(markedImage.data, markedImage.step.buf[1] * markedImage.cols * markedImage.rows);
+
+        // Create a sutable vector type that can be passed across the ABI
+        Platform::Collections::Vector<Frame^>^ frameVector = ref new Platform::Collections::Vector<Frame^>(frames);
+
+        // Invoke callback
+        callback->Invoke(frameVector, imageData);
+    });
+}
+
+void Configuration::setErrorCallback(ErrorDelegate^ callback)
+{
+    this->configurationObj.setErrorHandler([callback](Companion::Error::Code code)
+    {
+        callback->Invoke(ss2ps(Companion::Error::getError(code)));
+    });
+}
+
 void Configuration::setSkipFrame(int skipFrame)
 {
     this->configurationObj.setSkipFrame(skipFrame);
-}
-
-void Configuration::setPixelBuffer(IBuffer^ pixelBuffer)
-{
-    // Define dispatcher for the UI thread
-    Configuration::dispatcher = CoreWindow::GetForCurrentThread()->Dispatcher;
-
-    // Query the IBufferByteAccess interface.  
-    Microsoft::WRL::ComPtr<IBufferByteAccess> bufferByteAccess;
-    reinterpret_cast<IInspectable*>(pixelBuffer)->QueryInterface(IID_PPV_ARGS(&bufferByteAccess));
-
-    // Retrieve the buffer data.  
-    uint8* pixels = nullptr;
-    bufferByteAccess->Buffer(&pixels);
-    Configuration::pixels = pixels;
 }
 
 void Configuration::setSource(ImageStream^ stream)
@@ -99,33 +96,14 @@ void Configuration::addModel(FeatureMatchingModel^ model)
 
 void Configuration::run()
 {
-    // Test
-    Configuration::getDataEvent += ref new GetDataDelegate(this, &Configuration::GetDataImpl2);
-
-    // Create StreamWorker
     std::queue<cv::Mat> queue;
     Companion::Thread::StreamWorker ps(queue);
-
-    try
-    {
-        this->configurationObj.run(ps);
-    }
-    catch (Companion::Error::Code errorCode)
-    {
-        Configuration::error(errorCode);
-    }
+    this->configurationObj.run(ps);
 }
 
 void Configuration::stop()
 {
-    try
-    {
-        this->configurationObj.stop();
-    }
-    catch (Companion::Error::Code errorCode)
-    {
-        Configuration::error(errorCode);
-    }
+    this->configurationObj.stop();
 }
 
 int Configuration::getSkipFrame()
@@ -157,124 +135,3 @@ int Configuration::getSkipFrame()
 //
 //    return output;
 //}
-
-void Configuration::error(Companion::Error::Code code)
-{
-    int hresult = static_cast<int>(getErrorCode(code));
-    throw ref new Platform::Exception(hresult);
-}
-
-void Configuration::callback(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame)
-{
-    // Draw found objects onto the frame
-    Companion::Draw::Drawable *drawable;
-
-    for (int x = 0; x < objects.size(); x++)
-    {
-        drawable = objects.at(x);
-        drawable->draw(frame);
-    }
-
-    // Add alpha channel (required for WritableBitmap)
-    cv::Mat image = cv::Mat(frame.rows, frame.cols, CV_8UC4);
-    try
-    {
-        cvtColor(frame, image, CV_BGR2BGRA);
-    }
-    catch (cv::Exception ex)
-    {
-        OutputDebugString(ss2ps(ex.msg)->Data());
-    }
-
-    // Copy new data to raw pixel bytes of the WritableBitmap pixelbuffer
-    memcpy(Configuration::pixels, image.data, image.step.buf[1] * image.cols*image.rows);
-
-    //uint8* temp = _pixels;
-    //const unsigned int width = 1920;
-    //const unsigned int height = 1080;
-
-    //for (unsigned int k = 0; k < height; k++)
-    //{
-    //    for (unsigned int i = 0; i < (width * 4); i += 4)
-    //    {
-    //        int pos = k * (width * 4) + (i);
-    //        temp[pos] = image.data[pos];
-    //        temp[pos + 1] = image.data[pos + 1];
-    //        temp[pos + 2] = image.data[pos + 2];
-    //        temp[pos + 3] = image.data[pos + 3];
-    //    }
-    //}
-
-    // Release frames
-    frame.release();
-    image.release();
-
-    Configuration::dispatcher->RunAsync(CoreDispatcherPriority::High, ref new DispatchedHandler([]()
-    {
-        featuresFoundEvent();
-
-    }, Platform::CallbackContext::Any));
-}
-
-
-
-
-/***********************************************************************************************
- *+++ TEST +++
- ***********************************************************************************************/
-void Configuration::GetDataImpl(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame)
-{
-    Configuration::getDataEvent(objects, frame);
-}
-
-void Configuration::GetDataImpl2(std::vector<Companion::Draw::Drawable*> objects, cv::Mat frame)
-{
-    // Draw found objects onto the frame
-    Companion::Draw::Drawable *drawable;
-
-    for (int x = 0; x < objects.size(); x++)
-    {
-        drawable = objects.at(x);
-        drawable->draw(frame);
-    }
-
-    // Add alpha channel (required for WritableBitmap)
-    cv::Mat image = cv::Mat(frame.rows, frame.cols, CV_8UC4);
-    try
-    {
-        cvtColor(frame, image, CV_BGR2BGRA);
-    }
-    catch (cv::Exception ex)
-    {
-        OutputDebugString(ss2ps(ex.msg)->Data());
-    }
-
-    // Copy new data to raw pixel bytes of the WritableBitmap pixelbuffer
-    memcpy(Configuration::pixels, image.data, image.step.buf[1] * image.cols*image.rows);
-
-    //uint8* temp = _pixels;
-    //const unsigned int width = 1920;
-    //const unsigned int height = 1080;
-
-    //for (unsigned int k = 0; k < height; k++)
-    //{
-    //    for (unsigned int i = 0; i < (width * 4); i += 4)
-    //    {
-    //        int pos = k * (width * 4) + (i);
-    //        temp[pos] = image.data[pos];
-    //        temp[pos + 1] = image.data[pos + 1];
-    //        temp[pos + 2] = image.data[pos + 2];
-    //        temp[pos + 3] = image.data[pos + 3];
-    //    }
-    //}
-
-    // Release frames
-    frame.release();
-    image.release();
-
-    Configuration::dispatcher->RunAsync(CoreDispatcherPriority::High, ref new DispatchedHandler([]()
-    {
-        Configuration::featuresFoundEvent();
-
-    }, Platform::CallbackContext::Any));
-}
