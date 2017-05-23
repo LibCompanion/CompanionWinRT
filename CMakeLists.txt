@@ -1,7 +1,5 @@
 #
-# This program is a Windows Runtime wrapper for the Companion CV library.
-#          https://github.com/LibCompanion/libCompanion
-#
+# CompanionWinRT is a Windows Runtime wrapper for libCompanion.
 # Copyright (C) 2017 Dimitri Kotlovsky
 #
 # This program is free software: you can redistribute it and/or modify

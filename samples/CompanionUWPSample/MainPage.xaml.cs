@@ -1,7 +1,5 @@
 ﻿/*
- * This program is a C#/UWP sample app for the Companion WinRT wrapper.
- *          https://github.com/LibCompanion/libCompanion
- *
+ * CompanionUWPSample is a C#/UWP sample app for CompanionWinRT.
  * Copyright (C) 2017 Dimitri Kotlovsky
  *
  * This program is free software: you can redistribute it and/or modify
