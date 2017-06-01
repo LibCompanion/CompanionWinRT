@@ -31,21 +31,29 @@ void Configuration::setProcessing(ObjectDetection^ detection)
 
 void Configuration::setResultCallback(ResultDelegate^ callback)
 {
-    this->configurationObj.setResultHandler([callback](std::vector<Companion::Draw::Drawable*> objects, cv::Mat image)
+    this->configurationObj.setResultHandler([callback](std::vector<std::pair<Companion::Draw::Drawable*, int>> objects, cv::Mat image)
     {
         std::vector<Frame^> frames;
         Companion::Draw::Drawable *drawable;
 
-        for (int x = 0; x < objects.size(); x++)
+        for (size_t i = 0; i < objects.size(); i++)
         {
-            // Draw found objects onto the image
-            drawable = objects.at(x);
+            // Mark the detected object
+            drawable = objects.at(i).first;
             drawable->draw(image);
 
-            // Capsule the pixel data into ABI friendly 'Frame' objects
-            std::vector<Companion::Draw::Line*> lines = (static_cast<Companion::Draw::Lines*>(drawable))->getLines();
-            Frame^ frame = ref new Frame(lines.at(0)->getStart(), lines.at(0)->getEnd(), lines.at(3)->getStart(), lines.at(3)->getEnd());
-            frames.push_back(frame);
+            // Cast the drawables to lines
+            Companion::Draw::Lines *dLines = dynamic_cast<Companion::Draw::Lines*>(drawable);
+            if (dLines != nullptr)
+            {
+                // Draw the id of the detected object
+                std::vector<Companion::Draw::Line*> lines = dLines->getLines();
+                cv::putText(image, std::to_string(objects.at(i).second), lines.at(0)->getEnd(), cv::FONT_HERSHEY_DUPLEX, 2, cv::Scalar(0, 255, 0), 4);
+            
+                // Capsule the pixel data into ABI friendly 'Frame' objects
+                Frame^ frame = ref new Frame(lines.at(0)->getStart(), lines.at(0)->getEnd(), lines.at(3)->getStart(), lines.at(3)->getEnd());
+                frames.push_back(frame);
+            }
         }
 
         // Add alpha channel (required for WritableBitmap)
@@ -76,10 +84,20 @@ void Configuration::setSkipFrame(int skipFrame)
     this->configurationObj.setSkipFrame(skipFrame);
 }
 
+int Configuration::getSkipFrame()
+{
+    return this->configurationObj.getSkipFrame();
+}
+
 void Configuration::setSource(ImageStream^ stream)
 {
     this->stream = stream;
     this->configurationObj.setSource(this->stream->getStream());
+}
+
+ImageStream^ Configuration::getSource()
+{
+    return this->stream;
 }
 
 void Configuration::addModel(FeatureMatchingModel^ model)
@@ -102,11 +120,6 @@ void Configuration::run()
 void Configuration::stop()
 {
     this->configurationObj.stop();
-}
-
-int Configuration::getSkipFrame()
-{
-    return this->configurationObj.getSkipFrame();
 }
 
 /* Videos as source are not supported right now. You have to build FFMpeg for OpenCV and WinRT.

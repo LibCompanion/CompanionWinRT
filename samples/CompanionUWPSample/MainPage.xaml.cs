@@ -1,5 +1,7 @@
 ﻿/*
- * CompanionUWPSample is a C#/UWP sample app for CompanionWinRT.
+ * This program is a C#/UWP sample app for the Companion WinRT wrapper.
+ *          https://github.com/LibCompanion/libCompanion
+ *
  * Copyright (C) 2017 Dimitri Kotlovsky
  *
  * This program is free software: you can redistribute it and/or modify
@@ -154,6 +156,24 @@ namespace CompanionUWPSample
                     // Create a WritableBitmap as the output destination for Companion
                     //this.CreateBitmap(new Uri(this.imageSourceURI, "Muelheim_HBF 001.jpg"));
 
+                    // Constantly import images as the source for processing
+                    this.m_workItem = Windows.System.Threading.ThreadPool.RunAsync(async (workItem) =>
+                    {
+                        // Save the source image paths to a list for the 'ImageStream' object
+                        IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
+
+                        // Stop loading images if the processing was canceled
+                        bool canceled = false;
+
+                        for (int i = 0; (i < fileList.Count) && !canceled; i++)
+                        {
+                            // Use this control to adjust the streaming rate
+                            //await Task.Delay(TimeSpan.FromSeconds(2));
+
+                            this.configuration.getSource().addImage(fileList[i].Path); // ToDO: check what happens if source is not set
+                        }
+                    });
+
                     // Run Companion on a background thread
                     await this.RunCompanion();
 
@@ -244,34 +264,18 @@ namespace CompanionUWPSample
                 // Set number of frames to skip
                 this.configuration.setSkipFrame(0);
 
-
-
-                /**********************************************************************************
-                 * Set input source (image folder because video source is not supported right now)
-                 **********************************************************************************/
-
-                // Save the source image paths to a list for the 'ImageStream' object
-                List<String> imagePathList = new List<String>();
-                IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
-                foreach (StorageFile file in fileList)
-                {
-                    imagePathList.Add(file.Path);
-                }
-
                 // Add source to configuaration
-                CW.ImageStream stream = new CW.ImageStream(imagePathList);
+                CW.ImageStream stream = new CW.ImageStream(50);
                 this.configuration.setSource(stream);
-
-
 
                 /**********************************************************
                  * Create and add feature matching models to configuration
                  **********************************************************/
 
                 // Create feature matching models
-                CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Left.jpg");
-                CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Middle.jpg");
-                CW.FeatureMatchingModel model3 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Right.jpg");
+                CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Right.jpg", 0);
+                CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Middle.jpg", 1);
+                CW.FeatureMatchingModel model3 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Left.jpg", 2);
 
                 // Add feature matching models
                 this.configuration.addModel(model1);
@@ -302,9 +306,9 @@ namespace CompanionUWPSample
                         }
                     }
                     this.m_bm.Invalidate();
-                    if (frames.Count != 0)
+                    for (int i = 0; i < frames.Count; i++)
                     {
-                        this.UpdateUIOutput("x: " + frames[0].getUpperLeftCorner().x + ", y: " + frames[0].getUpperLeftCorner().y);
+                        this.UpdateUIOutput("Obj " + i + ": x_" + frames[i].getUpperLeftCorner().x + ", y_" + frames[i].getUpperLeftCorner().y);
                     }
                 } catch (Exception ex)
                 {

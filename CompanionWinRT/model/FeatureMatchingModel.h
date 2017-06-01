@@ -41,8 +41,9 @@ namespace CompanionWinRT
          * Creates an 'FeatureMatchingModel' wrapper with the provided image path.
          *
          * @param imagePath path of the image that is going to be a feature matching model
+         * @param id        the ID of this model
          */
-        FeatureMatchingModel(Platform::String^ imagePath);
+        FeatureMatchingModel(Platform::String^ imagePath, int id);
 
         /**
          * Destructs this instance.

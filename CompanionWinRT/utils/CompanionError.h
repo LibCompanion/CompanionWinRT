@@ -58,7 +58,6 @@ namespace CompanionWinRT
         recognition_not_found, ///< Provided handle to CPUFeatureMatching object is null (nullptr)
         config_or_recognition_not_found, ///< Provided pointer to Configuration  or handle to CPUFeatureMatching object is null (nullptr)
         objectdetection_not_found, ///< Provided handle to ObjectDetection object is null (nullptr)
-        image_path_list_not_set, ///< Provided handle to image path vector is null or has no entries
         model_path_not_set ///< Provided handle to model path is null (nullptr)
     };
 
@@ -131,9 +130,6 @@ namespace CompanionWinRT
                         break;
                     case ErrorCode::objectdetection_not_found :
                         error = "The handle that points to the 'ObjectDetection' objects is null.";
-                        break;
-                    case ErrorCode::image_path_list_not_set :
-                        error = "The handle that points to the image path vector is null or has no entries.";
                         break;
                     case ErrorCode::model_path_not_set :
                         error = "The handle that points to the model path is null.";
