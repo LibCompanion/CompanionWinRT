@@ -1,6 +1,6 @@
 # CompanionWinRT
 
-CompanionWinRT wraps the [libCompanion](https://github.com/LibCompanion/libCompanion/) CV library in a Windows Runtime Component. Since it uses C++/CX the WinRT Component can be used in Universal Windows Platform (UWP) apps that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
+CompanionWinRT wraps the [libCompanion](https://github.com/LibCompanion/libCompanion/) CV library in a *Windows Runtime Component*. Because of C++/CX, the WinRT Component can be used in *Universal Windows Platform* (UWP) apps that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
 
 # Dependencies
 
