@@ -41,6 +41,16 @@ namespace CompanionWinRT
     public:
 
         /**
+         * Creates a 'Frame' object with the provided corners.
+         *
+         * @param upperLeft     upper left corner
+         * @param upperRight    upper right corner
+         * @param lowerRight    lower right corner
+         * @param lowerLeft     lower left corner
+         */
+        Frame(Point upperLeft, Point upperRight, Point lowerRight, Point lowerLeft);
+        
+        /**
          * Returns the upper left corner of this frame.
          *
          * @return upper left corner
@@ -82,14 +92,7 @@ namespace CompanionWinRT
          *   -----------------
          *   3               2
          */
-        Point p0, p1, p2, p3;
-
-    internal:
-
-        /**
-         * Creates a 'Frame' object with the provided corners.
-         */
-        Frame(cv::Point upperLeft, cv::Point upperRight, cv::Point lowerRight, cv::Point lowerLeft);
+        Point upperLeft, upperRight, lowerRight, lowerLeft;
 
     };
 }

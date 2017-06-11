@@ -17,7 +17,7 @@
  */
 
 #include "ImageStream.h"
-#include "..\utils\CompanionError.h"
+#include "companionWinRT\utils\CompanionUtils.h"
 
 using namespace CompanionWinRT;
 

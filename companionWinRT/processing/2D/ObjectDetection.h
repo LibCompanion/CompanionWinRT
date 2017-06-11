@@ -21,7 +21,7 @@
 #include <companion\Configuration.h>
 #include <companion\processing\2D\ObjectDetection.h>
 
-#include "..\..\algo\CPUFeatureMatching.h"
+#include "companionWinRT\algo\CPUFeatureMatching.h"
 
 namespace CompanionWinRT
 {

@@ -288,10 +288,10 @@ namespace CompanionUWPSample
         /**
          * Result callback method for the companion processing.
          * 
-         * @param frames    list of frames that mark a detected object
+         * @param results   list of results that represent the detected objects
          * @param image     the processed image with visually markers for the detected objects
          */
-        public void ResultCallback(IList<CW.Frame> frames, byte[] image)
+        public void ResultCallback(IList<CW.Result> results, byte[] image)
         {
             Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
             {
@@ -306,9 +306,9 @@ namespace CompanionUWPSample
                         }
                     }
                     this.m_bm.Invalidate();
-                    for (int i = 0; i < frames.Count; i++)
+                    for (int i = 0; i < results.Count; i++)
                     {
-                        this.UpdateUIOutput("Obj " + i + ": x_" + frames[i].getUpperLeftCorner().x + ", y_" + frames[i].getUpperLeftCorner().y);
+                        this.UpdateUIOutput("Obj " + i + ": x_" + results[i].getFrame().getUpperLeftCorner().x + ", y_" + results[i].getFrame().getUpperLeftCorner().y);
                     }
                 } catch (Exception ex)
                 {

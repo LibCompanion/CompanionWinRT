@@ -20,8 +20,8 @@
 
 #include "processing\2D\ObjectDetection.h"
 #include "input\ImageStream.h"
-#include "model\FeatureMatchingModel.h"
-#include "draw\Frame.h"
+#include "model\processing\FeatureMatchingModel.h"
+#include "model\result\Result.h"
 
 using namespace Windows::Foundation::Collections;
 
@@ -30,10 +30,10 @@ namespace CompanionWinRT
     /**
      * A delegate that defines a result callback function for the client app.
      *
-     * @param frames    vector of 'Frame' object references that represent the detected objects
+     * @param results   vector of 'Result' object references that represent the detected objects
      * @param image     byte array reference of the processed image 
      */
-    public delegate void ResultDelegate(IVector<Frame^>^ frames, const Platform::Array<uint8>^ image);
+    public delegate void ResultDelegate(IVector<Result^>^ results, const Platform::Array<uint8>^ image);
 
     /**
      * A delegate that defines an error callback function for the client app.

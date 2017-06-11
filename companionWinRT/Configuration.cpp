@@ -31,29 +31,39 @@ void Configuration::setProcessing(ObjectDetection^ detection)
 
 void Configuration::setResultCallback(ResultDelegate^ callback)
 {
-    this->configurationObj.setResultHandler([callback](std::vector<std::pair<Companion::Draw::Drawable*, int>> objects, cv::Mat image)
+    this->configurationObj.setResultHandler([callback](std::vector<Companion::Model::Result*> results, cv::Mat image)
     {
-        std::vector<Frame^> frames;
-        Companion::Draw::Drawable *drawable;
+        Platform::Collections::Vector<Result^>^ resultsCX = ref new Platform::Collections::Vector<Result^>();
+        Result^ resultCX;
+        Frame^ frameCX;
 
-        for (size_t i = 0; i < objects.size(); i++)
+        Companion::Model::Result* result;
+        Companion::Draw::Frame* frame;
+
+        for (size_t i = 0; i < results.size(); i++)
         {
-            // Mark the detected object
-            drawable = objects.at(i).first;
-            drawable->draw(image);
-
-            // Cast the drawables to lines
-            Companion::Draw::Lines *dLines = dynamic_cast<Companion::Draw::Lines*>(drawable);
-            if (dLines != nullptr)
-            {
-                // Draw the id of the detected object
-                std::vector<Companion::Draw::Line*> lines = dLines->getLines();
-                cv::putText(image, std::to_string(objects.at(i).second), lines.at(0)->getEnd(), cv::FONT_HERSHEY_DUPLEX, 2, cv::Scalar(0, 255, 0), 4);
+            result = results.at(i);
+            frame = dynamic_cast<Companion::Draw::Frame*>(result->getModel());
             
-                // Capsule the pixel data into ABI friendly 'Frame' objects
-                Frame^ frame = ref new Frame(lines.at(0)->getStart(), lines.at(0)->getEnd(), lines.at(3)->getStart(), lines.at(3)->getEnd());
-                frames.push_back(frame);
-            }
+            // Draw a frame around the detected object
+            frame->draw(image);
+
+            // Draw the id of the detected object
+            cv::putText(image,
+                        std::to_string(result->getId()),
+                        frame->getTopRight(),
+                        cv::FONT_HERSHEY_DUPLEX,
+                        2,
+                        frame->getColor(),
+                        frame->getThickness());
+
+            // Capsule the result data into ABI friendly C++/CX objects
+            frameCX = ref new Frame(Point{ frame->getTopLeft().x,     frame->getTopLeft().y     },
+                                    Point{ frame->getTopRight().x,    frame->getTopRight().y    },
+                                    Point{ frame->getBottomRight().x, frame->getBottomRight().y },
+                                    Point{ frame->getBottomLeft().x,  frame->getBottomLeft().y  });
+            resultCX = ref new Result(result->getId(), result->getScoring(), frameCX);
+            resultsCX->Append(resultCX);
         }
 
         // Add alpha channel (required for WritableBitmap)
@@ -63,11 +73,13 @@ void Configuration::setResultCallback(ResultDelegate^ callback)
         // Copy image data to a byte[] so it can be passed across the ABI
         Platform::Array<uint8>^ imageData = ref new Platform::Array<uint8>(markedImage.data, markedImage.step.buf[1] * markedImage.cols * markedImage.rows);
 
-        // Create a sutable vector type that can be passed across the ABI
-        Platform::Collections::Vector<Frame^>^ frameVector = ref new Platform::Collections::Vector<Frame^>(frames);
-
         // Invoke callback
-        callback->Invoke(frameVector, imageData);
+        callback->Invoke(resultsCX, imageData);
+
+        // Release data
+        image.release();
+        markedImage.release();
+        results.clear();
     });
 }
 

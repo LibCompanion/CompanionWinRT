@@ -21,7 +21,8 @@ SET(SOURCE
     Configuration.cpp Configuration.h
     algo/CPUFeatureMatching.cpp algo/CPUFeatureMatching.h
     draw/Frame.cpp draw/Frame.h
-    model/FeatureMatchingModel.cpp model/FeatureMatchingModel.h
+    model/processing/FeatureMatchingModel.cpp model/processing/FeatureMatchingModel.h
+    model/result/Result.cpp model/result/Result.h
     processing/2D/ObjectDetection.cpp processing/2D/ObjectDetection.h
     input/ImageStream.cpp input/ImageStream.h
     utils/CompanionError.h
