@@ -21,7 +21,8 @@ SET(SOURCE
     Configuration.cpp Configuration.h
     algo/CPUFeatureMatching.cpp algo/CPUFeatureMatching.h
     draw/Frame.cpp draw/Frame.h
-    model/FeatureMatchingModel.cpp model/FeatureMatchingModel.h
+    model/processing/FeatureMatchingModel.cpp model/processing/FeatureMatchingModel.h
+    model/result/Result.cpp model/result/Result.h
     processing/2D/ObjectDetection.cpp processing/2D/ObjectDetection.h
     input/ImageStream.cpp input/ImageStream.h
     utils/CompanionError.h
@@ -41,7 +42,7 @@ endforeach()
 add_library(CompanionWinRT SHARED ${SOURCE})
 set_target_properties(CompanionWinRT PROPERTIES VS_WINRT_COMPONENT TRUE)
 set_target_properties(CompanionWinRT PROPERTIES VS_GLOBAL_ROOTNAMESPACE "CompanionWinRT")
-set_target_properties(CompanionWinRT PROPERTIES FOLDER "CompanionWinRT")
+set_target_properties(CompanionWinRT PROPERTIES FOLDER "companionWinRT")
 
 
 # Set linked libraries

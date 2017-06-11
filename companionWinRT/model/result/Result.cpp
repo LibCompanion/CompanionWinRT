@@ -16,31 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Frame.h"
+#include "Result.h"
 
 using namespace CompanionWinRT;
 
-Frame::Frame(Point upperLeft, Point upperRight, Point lowerRight, Point lowerLeft)
-    : upperLeft(upperLeft), upperRight(upperRight), lowerRight(lowerRight), lowerLeft(lowerLeft)
+Result::Result(int id, int score, Frame^ frame) : id(id), score(score), frame(frame)
 {
 }
 
-Point Frame::getUpperLeftCorner()
+int Result::getId()
 {
-    return this->upperLeft;
+    return this->id;
 }
 
-Point Frame::getUpperRightCorner()
+int Result::getScore()
 {
-    return this->upperRight;
+    return this->score;
 }
 
-Point Frame::getLowerRightCorner()
+Frame^ Result::getFrame()
 {
-    return this->lowerRight;
-}
-
-Point Frame::getLowerLeftCorner()
-{
-    return this->lowerLeft;
+    return this->frame;
 }

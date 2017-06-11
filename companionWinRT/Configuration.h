@@ -20,18 +20,20 @@
 
 #include "processing\2D\ObjectDetection.h"
 #include "input\ImageStream.h"
-#include "model\FeatureMatchingModel.h"
-#include "draw\Frame.h"
+#include "model\processing\FeatureMatchingModel.h"
+#include "model\result\Result.h"
+
+using namespace Windows::Foundation::Collections;
 
 namespace CompanionWinRT
 {
     /**
      * A delegate that defines a result callback function for the client app.
      *
-     * @param frames    vector of 'Frame' object references that represent the detected objects
+     * @param results   vector of 'Result' object references that represent the detected objects
      * @param image     byte array reference of the processed image 
      */
-    public delegate void ResultDelegate(IVector<Frame^>^ frames, const Platform::Array<uint8>^ image);
+    public delegate void ResultDelegate(IVector<Result^>^ results, const Platform::Array<uint8>^ image);
 
     /**
      * A delegate that defines an error callback function for the client app.
@@ -56,7 +58,7 @@ namespace CompanionWinRT
              *
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageProcessing' for this wrapper. This is a minum construct and has to be
+             * plausible abstract class 'ImageProcessing' for this wrapper. This is a minimum construct and has to be
              * further developed to provide the same flexability as the Companion native DLL.
              */
             void setProcessing(ObjectDetection^ detection);
@@ -83,16 +85,35 @@ namespace CompanionWinRT
             void setSkipFrame(int skipFrame);
 
             /**
+             * Returns the skip frame rate.
+             *
+             * @return number of frames that are skipped after each processed frame
+             */
+            int getSkipFrame();
+
+            /**
              * Sets the source.
              *
              * @param stream    an image stream as the processing source
              *
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'Stream' for this wrapper. This is a minum construct and has to be
+             * plausible abstract class 'Stream' for this wrapper. This is a minimum construct and has to be
              * further developed to provide the same flexability as the Companion native DLL.
              */
             void setSource(ImageStream^ stream);
+
+            /**
+             * Returns the image stream.
+             *
+             * @return the image stream of this configurtion
+             *
+             * Note:
+             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
+             * plausible abstract class 'Stream' for this wrapper. This is a minimum construct and has to be
+             * further developed to provide the same flexability as the Companion native DLL.
+             */
+            ImageStream^ getSource();
 
             /**
              * Adds a 'FeatureMatchingModel' object to this companion configuration.
@@ -110,13 +131,6 @@ namespace CompanionWinRT
              * Stops processing of the Companion library.
              */
             void stop();
-
-            /**
-             * Returns the skip frame rate.
-             *
-             * @return number of frames that are skipped after each processed frame
-             */
-            int getSkipFrame();
 
         private:
 

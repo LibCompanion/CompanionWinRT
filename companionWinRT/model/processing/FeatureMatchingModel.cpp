@@ -17,17 +17,19 @@
  */
 
 #include "FeatureMatchingModel.h"
-#include "..\utils\CompanionError.h"
+#include "companionWinRT\utils\CompanionUtils.h"
+#include "companionWinRT\utils\CompanionError.h"
 
 using namespace CompanionWinRT;
 
-FeatureMatchingModel::FeatureMatchingModel(Platform::String^ imagePath)
+FeatureMatchingModel::FeatureMatchingModel(Platform::String^ imagePath, int id)
 {
     if (imagePath != nullptr)
     {
-        this->featureMatchingModelObj = new Companion::Model::FeatureMatchingModel();
+        this->featureMatchingModelObj = new Companion::Model::Processing::FeatureMatchingModel();
         this->imageModel = cv::imread(ps2ss(imagePath), cv::IMREAD_GRAYSCALE); // ToDO: should the user be able to change IMREAD value?
         this->featureMatchingModelObj->setImage(this->imageModel);
+        this->featureMatchingModelObj->setID(id);
         
         /* ToDo for wrapper: construct 'FeatureMatchingModel' with a reference to 'CPUFeatureMatching' */
         // Only works on CPU -- ToDo Exception Handling if wrong type?
@@ -46,7 +48,7 @@ FeatureMatchingModel::~FeatureMatchingModel()
     this->featureMatchingModelObj = nullptr;
 }
 
-Companion::Model::ImageRecognitionModel* FeatureMatchingModel::getModel()
+Companion::Model::Processing::ImageRecognitionModel* FeatureMatchingModel::getModel()
 {
     return this->featureMatchingModelObj;
 }

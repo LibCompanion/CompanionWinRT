@@ -17,7 +17,7 @@
  */
 
 #include "ObjectDetection.h"
-#include "..\..\utils\CompanionError.h"
+#include "companionWinRT\utils\CompanionError.h"
 
 using namespace CompanionWinRT;
 

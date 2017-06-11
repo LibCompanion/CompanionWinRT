@@ -16,34 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <collection.h>
-
 #include "ImageStream.h"
-#include "..\utils\CompanionError.h"
+#include "companionWinRT\utils\CompanionUtils.h"
 
 using namespace CompanionWinRT;
 
-ImageStream::ImageStream(IVector<Platform::String^>^ imagePathList)
+ImageStream::ImageStream(int maxImages)
 {
-    if ((imagePathList != nullptr) && (imagePathList->Size != 0) && (imagePathList->First() != nullptr))
-    {
-        this->imageStreamObj = new Companion::Input::Image();
-        for each (Platform::String^ path in imagePathList)
-        {
-            this->imageStreamObj->addImagePath(ps2ss(path));
-        }
-    }
-    else
-    {
-        int hresult = static_cast<int>(ErrorCode::image_path_list_not_set);
-        throw ref new Platform::Exception(hresult);
-    }
+    this->imageStreamObj = new Companion::Input::Image(maxImages);
 }
 
 ImageStream::~ImageStream()
 {
     delete this->imageStreamObj;
     this->imageStreamObj = nullptr;
+}
+
+void ImageStream::addImage(Platform::String^ imgPath)
+{
+    this->imageStreamObj->addImage(ps2ss(imgPath));
 }
 
 Companion::Input::Stream* ImageStream::getStream()

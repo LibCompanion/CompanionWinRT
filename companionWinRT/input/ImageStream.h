@@ -20,8 +20,6 @@
 
 #include <companion\input\Image.h>
 
-using namespace Windows::Foundation::Collections;
-
 namespace CompanionWinRT
 {
     /**
@@ -38,16 +36,23 @@ namespace CompanionWinRT
         public:
 
             /**
-             * Creates an 'ImageStream' wrapper with the provided image paths.
+             * Creates an 'ImageStream' wrapper with the provided maximum amount of images that can be loaded at the same time.
              *
-             * @param imagePathList list of the paths of the images that are going to be processed
+             * @param maxImages     maximum amount of images that can be loaded at the same time
              */
-            ImageStream(IVector<Platform::String^>^ imagePathList);
+            ImageStream(int maxImages);
             
             /**
              * Destructs this instance.
              */
             virtual ~ImageStream();
+
+            /**
+             * Load an image that is going to be processed.
+             *
+             * @param imgPath   path of the image that is going to be processed
+             */
+            void addImage(Platform::String^ imgPath);
 
         private:
 

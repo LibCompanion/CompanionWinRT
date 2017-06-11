@@ -31,21 +31,39 @@ void Configuration::setProcessing(ObjectDetection^ detection)
 
 void Configuration::setResultCallback(ResultDelegate^ callback)
 {
-    this->configurationObj.setResultHandler([callback](std::vector<Companion::Draw::Drawable*> objects, cv::Mat image)
+    this->configurationObj.setResultHandler([callback](std::vector<Companion::Model::Result*> results, cv::Mat image)
     {
-        std::vector<Frame^> frames;
-        Companion::Draw::Drawable *drawable;
+        Platform::Collections::Vector<Result^>^ resultsCX = ref new Platform::Collections::Vector<Result^>();
+        Result^ resultCX;
+        Frame^ frameCX;
 
-        for (int x = 0; x < objects.size(); x++)
+        Companion::Model::Result* result;
+        Companion::Draw::Frame* frame;
+
+        for (size_t i = 0; i < results.size(); i++)
         {
-            // Draw found objects onto the image
-            drawable = objects.at(x);
-            drawable->draw(image);
+            result = results.at(i);
+            frame = dynamic_cast<Companion::Draw::Frame*>(result->getModel());
+            
+            // Draw a frame around the detected object
+            frame->draw(image);
 
-            // Capsule the pixel data into ABI friendly 'Frame' objects
-            std::vector<Companion::Draw::Line*> lines = (static_cast<Companion::Draw::Lines*>(drawable))->getLines();
-            Frame^ frame = ref new Frame(lines.at(0)->getStart(), lines.at(0)->getEnd(), lines.at(3)->getStart(), lines.at(3)->getEnd());
-            frames.push_back(frame);
+            // Draw the id of the detected object
+            cv::putText(image,
+                        std::to_string(result->getId()),
+                        frame->getTopRight(),
+                        cv::FONT_HERSHEY_DUPLEX,
+                        2,
+                        frame->getColor(),
+                        frame->getThickness());
+
+            // Capsule the result data into ABI friendly C++/CX objects
+            frameCX = ref new Frame(Point{ frame->getTopLeft().x,     frame->getTopLeft().y     },
+                                    Point{ frame->getTopRight().x,    frame->getTopRight().y    },
+                                    Point{ frame->getBottomRight().x, frame->getBottomRight().y },
+                                    Point{ frame->getBottomLeft().x,  frame->getBottomLeft().y  });
+            resultCX = ref new Result(result->getId(), result->getScoring(), frameCX);
+            resultsCX->Append(resultCX);
         }
 
         // Add alpha channel (required for WritableBitmap)
@@ -55,11 +73,13 @@ void Configuration::setResultCallback(ResultDelegate^ callback)
         // Copy image data to a byte[] so it can be passed across the ABI
         Platform::Array<uint8>^ imageData = ref new Platform::Array<uint8>(markedImage.data, markedImage.step.buf[1] * markedImage.cols * markedImage.rows);
 
-        // Create a sutable vector type that can be passed across the ABI
-        Platform::Collections::Vector<Frame^>^ frameVector = ref new Platform::Collections::Vector<Frame^>(frames);
-
         // Invoke callback
-        callback->Invoke(frameVector, imageData);
+        callback->Invoke(resultsCX, imageData);
+
+        // Release data
+        image.release();
+        markedImage.release();
+        results.clear();
     });
 }
 
@@ -76,10 +96,20 @@ void Configuration::setSkipFrame(int skipFrame)
     this->configurationObj.setSkipFrame(skipFrame);
 }
 
+int Configuration::getSkipFrame()
+{
+    return this->configurationObj.getSkipFrame();
+}
+
 void Configuration::setSource(ImageStream^ stream)
 {
     this->stream = stream;
     this->configurationObj.setSource(this->stream->getStream());
+}
+
+ImageStream^ Configuration::getSource()
+{
+    return this->stream;
 }
 
 void Configuration::addModel(FeatureMatchingModel^ model)
@@ -102,11 +132,6 @@ void Configuration::run()
 void Configuration::stop()
 {
     this->configurationObj.stop();
-}
-
-int Configuration::getSkipFrame()
-{
-    return this->configurationObj.getSkipFrame();
 }
 
 /* Videos as source are not supported right now. You have to build FFMpeg for OpenCV and WinRT.
