@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CPUFeatureMatching.h"
+#include "FeatureMatching.h"
 
 using namespace CompanionWinRT;
 
-CPUFeatureMatching::CPUFeatureMatching(CPUFeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures,
-                                       int countMatches, bool useIRA)
+FeatureMatching::FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures,
+                                 int countMatches, bool useIRA)
 {
     // Create descriptor matcher
     int type = (int) matcherType;
@@ -30,13 +30,13 @@ CPUFeatureMatching::CPUFeatureMatching(CPUFeatureDetector detector, DescriptorMa
     // Create feature matching configuration with the desired algorithm and parameters
     switch (detector)
     {
-        case CPUFeatureDetector::BRISK :
+        case FeatureDetector::BRISK :
             this->feature = cv::BRISK::create(thresh);
-            this->featureMatchingObj = new Companion::Algorithm::CPU::FeatureMatching(this->feature, this->feature, this->matcher, type, countMatches, useIRA);
+            this->featureMatchingObj = new Companion::Algorithm::FeatureMatching(this->feature, this->feature, this->matcher, type, countMatches, useIRA);
             break;
-        case CPUFeatureDetector::ORB :
+        case FeatureDetector::ORB :
             this->feature = cv::ORB::create(nfeatures);
-            this->featureMatchingObj = new Companion::Algorithm::CPU::FeatureMatching(this->feature, this->feature, this->matcher, type);
+            this->featureMatchingObj = new Companion::Algorithm::FeatureMatching(this->feature, this->feature, this->matcher, type);
             break;
         default:
             break;
@@ -45,7 +45,7 @@ CPUFeatureMatching::CPUFeatureMatching(CPUFeatureDetector detector, DescriptorMa
     }
 }
 
-CPUFeatureMatching::~CPUFeatureMatching()
+FeatureMatching::~FeatureMatching()
 {
     this->matcher.release();
     if (this->feature)
@@ -56,7 +56,7 @@ CPUFeatureMatching::~CPUFeatureMatching()
     this->featureMatchingObj = nullptr;
 }
 
-Companion::Algorithm::ImageRecognition* CPUFeatureMatching::getRecognition()
+Companion::Algorithm::ImageRecognition* FeatureMatching::getRecognition()
 {
     return this->featureMatchingObj;
 }

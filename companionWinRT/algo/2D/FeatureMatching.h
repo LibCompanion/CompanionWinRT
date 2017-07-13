@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include <companion\algo\cpu\CPUFeatureMatching.h>
+#include <companion\algo\2D\FeatureMatching.h>
 
 namespace CompanionWinRT
 {
     /**
-     * Enumeration class for feature matching algorithms (CPU).
+     * Enumeration class for feature matching algorithms.
      */
-    public enum class CPUFeatureDetector
+    public enum class FeatureDetector
     {
         BRISK,
         ORB
@@ -45,7 +45,7 @@ namespace CompanionWinRT
     };
 
     /**
-     * This class provides a WinRT wrapper for the 'CPUFeatureMatching' functionality of the Companion project.
+     * This class provides a WinRT wrapper for the 'FeatureMatching' functionality of the Companion project (CPU only).
      *
      * Note 1:
      * This is a minimum construction -- it has to be extended to provide the same flexability as the Companion native DLL.
@@ -56,22 +56,22 @@ namespace CompanionWinRT
      *
      * @author Dimitri Kotlovsky
      */
-    public ref class CPUFeatureMatching sealed
+    public ref class FeatureMatching sealed
     {
         public:
 
             /**
-             * Creates a 'CPUFeatureMatching' wrapper with the provided feature matching algorithm.
+             * Creates a 'FeatureMatching' wrapper with the provided feature matching algorithm.
              *
              * @param detector      desired feature detector
              * @param matcherType   type of the desired descriptor matcher
              */
-            CPUFeatureMatching(CPUFeatureDetector detector, DescriptorMatcher matcherType)
-                : CPUFeatureMatching(detector, matcherType, 60, 2000, 40, true)
+            FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType)
+                : FeatureMatching(detector, matcherType, 60, 2000, 40, true)
             {};
 
             /**
-             * Creates an 'CPUFeatureMatching' wrapper with the provided feature matching algorithm.
+             * Creates an 'FeatureMatching' wrapper with the provided feature matching algorithm.
              *
              * @param detector      desired feature detector
              * @param matcherType   type of the desired descriptor matcher
@@ -80,20 +80,20 @@ namespace CompanionWinRT
              * @param countMatches  how many matches should be found for a good matching result
              * @param useIRA        indicator to use IRA algorithm to use last detected objects from last scene
              */
-            CPUFeatureMatching(CPUFeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures,
-                               int countMatches, bool useIRA);
+            FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures,
+                            int countMatches, bool useIRA);
 
             /**
              * Destructs this instance.
              */
-            virtual ~CPUFeatureMatching();
+            virtual ~FeatureMatching();
 
         private:
 
             /**
              * The native 'FeatureMatching' object of this instance.
              */
-            Companion::Algorithm::CPU::FeatureMatching* featureMatchingObj;
+            Companion::Algorithm::FeatureMatching* featureMatchingObj;
             
             /**
              * The descriptor matcher of this feature matching configuration.
@@ -111,7 +111,7 @@ namespace CompanionWinRT
         internal:
 
             /**
-             * Internal method to provide the native 'ImageRecognition' object (in this case a 'CPUFeatureMatching' object).
+             * Internal method to provide the native 'ImageRecognition' object (in this case a 'FeatureMatching' object).
              *
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the

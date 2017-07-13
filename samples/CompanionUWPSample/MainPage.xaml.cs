@@ -111,7 +111,9 @@ namespace CompanionUWPSample
             // Initialize the image source folder
             try
             {
-                this.imageFolder = await this.assets.GetFolderAsync("Muelheim_HBF");
+                //this.imageFolder = await this.assets.GetFolderAsync("Muelheim_HBF");
+                //this.imageFolder = await this.assets.GetFolderAsync("Labor");
+                this.imageFolder = await this.assets.GetFolderAsync("images");
             }
             catch (System.IO.FileNotFoundException ex)
             {
@@ -251,21 +253,24 @@ namespace CompanionUWPSample
                 this.configuration = new CW.Configuration();
 
                 // Configure image recognition
-                CW.CPUFeatureMatching feature = new CW.CPUFeatureMatching(CW.CPUFeatureDetector.BRISK, CW.DescriptorMatcher.BRUTEFORCE_HAMMING);
+                CW.FeatureMatching feature = new CW.FeatureMatching(CW.FeatureDetector.BRISK, CW.DescriptorMatcher.BRUTEFORCE_HAMMING);
 
                 // Configure image processing
-                CW.ObjectDetection objectDetection = new CW.ObjectDetection(feature);
+                CW.ObjectDetection objectDetection = new CW.ObjectDetection(feature, 0.3f);
                 this.configuration.setProcessing(objectDetection);
 
-                // Set callback methods
-                this.configuration.setResultCallback(this.ResultCallback);
+                // Set callback methods (result image should have an alpha channel (required for WritableBitmap))
+                this.configuration.setResultCallback(this.ResultCallback, CW.ColorFormat.BGRA);
                 this.configuration.setErrorCallback(this.ErrorCallback);
 
                 // Set number of frames to skip
                 this.configuration.setSkipFrame(0);
 
+                // Set image buffer
+                this.configuration.setImageBuffer(5);
+
                 // Add source to configuaration
-                CW.ImageStream stream = new CW.ImageStream(50);
+                CW.ImageStream stream = new CW.ImageStream(30);
                 this.configuration.setSource(stream);
 
                 /**********************************************************
@@ -273,14 +278,17 @@ namespace CompanionUWPSample
                  **********************************************************/
 
                 // Create feature matching models
-                CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Right.jpg", 0);
-                CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Middle.jpg", 1);
-                CW.FeatureMatchingModel model3 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Left.jpg", 2);
+                //CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Right.jpg", 0);
+                //CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Middle.jpg", 1);
+                //CW.FeatureMatchingModel model3 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Left.jpg", 2);
+                //CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster.jpg", 0);
+                CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster_left.jpg", 0);
+                CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster_right.jpg", 1);
 
                 // Add feature matching models
-                this.configuration.addModel(model1);
+                //this.configuration.addModel(model1);
                 this.configuration.addModel(model2);
-                this.configuration.addModel(model3);
+                //this.configuration.addModel(model3);
 
             }).AsAsyncAction();
         }
@@ -308,13 +316,15 @@ namespace CompanionUWPSample
                     this.m_bm.Invalidate();
                     for (int i = 0; i < results.Count; i++)
                     {
-                        this.UpdateUIOutput("Obj " + i + ": x_" + results[i].getFrame().getUpperLeftCorner().x + ", y_" + results[i].getFrame().getUpperLeftCorner().y);
+                        CW.Point upperLeftCorner = results[i].getFrame().getUpperLeftCorner();
+                        this.UpdateUIOutput("Obj " + i + ": x_" + upperLeftCorner.x + ", y_" + upperLeftCorner.y);
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     this.UpdateUIOutput(ex.Message);
                 }
-                
+
             });
         }
 

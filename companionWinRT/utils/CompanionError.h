@@ -48,7 +48,7 @@ namespace CompanionWinRT
         descriptor_matcher_not_found, ///< Given descriptor matcher is not supported.
         wrong_model_type, ///< Given model class type is not supported for an image recognition search.
         invalid_companion_config, ///< Given configuration is invalid.
-        video_src_not_set, ///< Given video source is not set.
+        stream_src_not_set, ///< If given stream source is not set
         invalid_video_src, ///< Given video source is invalid (for example due to a wrong path).
         no_image_processing_algo_set, ///< No image processing algorithm is used.
         no_handler_set, ///< No callback handler is set.
@@ -107,8 +107,8 @@ namespace CompanionWinRT
                     case ErrorCode::invalid_companion_config :
                         error = ss2ps(Companion::Error::getError(Companion::Error::Code::invalid_companion_config));
                         break;
-                    case ErrorCode::video_src_not_set :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::video_src_not_set));
+                    case ErrorCode::stream_src_not_set:
+                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::stream_src_not_set));
                         break;
                     case ErrorCode::invalid_video_src :
                         error = ss2ps(Companion::Error::getError(Companion::Error::Code::invalid_video_src));
@@ -179,8 +179,8 @@ namespace CompanionWinRT
             case Companion::Error::Code::invalid_companion_config :
                 error = ErrorCode::invalid_companion_config;
                 break;
-            case Companion::Error::Code::video_src_not_set :
-                error = ErrorCode::video_src_not_set;
+            case Companion::Error::Code::stream_src_not_set:
+                error = ErrorCode::stream_src_not_set;
                 break;
             case Companion::Error::Code::invalid_video_src :
                 error = ErrorCode::invalid_video_src;

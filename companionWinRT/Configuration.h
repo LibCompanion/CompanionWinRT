@@ -22,6 +22,7 @@
 #include "input\ImageStream.h"
 #include "model\processing\FeatureMatchingModel.h"
 #include "model\result\Result.h"
+#include "utils\CompanionUtils.h"
 
 using namespace Windows::Foundation::Collections;
 
@@ -66,9 +67,10 @@ namespace CompanionWinRT
             /**
              * Sets a function as a result callback for the companion processing.
              *
-             * @param callback  a concrete function that works as a callback for the processing result
+             * @param callback      a concrete function that works as a callback for the processing result
+             * @param colorFormat   color format of the returned result image
              */
-            void setResultCallback(ResultDelegate^ callback);
+            void setResultCallback(ResultDelegate^ callback, ColorFormat colorFormat);
 
             /**
              * Sets a function as an error callback for the companion processing.
@@ -83,6 +85,13 @@ namespace CompanionWinRT
              * @param skipFrame number of frames which should be skipped after one image processing cycle
              */
             void setSkipFrame(int skipFrame);
+
+            /**
+             * Sets the maximum number of images to be loaded into a buffer.
+             *
+             * @param imageBuffer   maximum number of images to be loaed into a buffer
+             */
+            void setImageBuffer(int imageBuffer);
 
             /**
              * Returns the skip frame rate.

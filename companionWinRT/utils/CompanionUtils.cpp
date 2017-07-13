@@ -106,3 +106,29 @@ std::string ws2s(const std::wstring& wstr)
 
     return converterX.to_bytes(wstr);
 }
+
+Companion::ColorFormat CompanionWinRT::getColorFormat(CompanionWinRT::ColorFormat colorFormat)
+{
+    Companion::ColorFormat format = Companion::ColorFormat::RGB;
+
+    switch (colorFormat)
+    {
+        case CompanionWinRT::ColorFormat::RGB:
+            format = Companion::ColorFormat::RGB;
+            break;
+        case CompanionWinRT::ColorFormat::RGBA:
+            format = Companion::ColorFormat::RGBA;
+            break;
+        case CompanionWinRT::ColorFormat::BGR:
+            format = Companion::ColorFormat::BGR;
+            break;
+        case CompanionWinRT::ColorFormat::BGRA:
+            format = Companion::ColorFormat::BGRA;
+            break;
+        case CompanionWinRT::ColorFormat::GRAY:
+            format = Companion::ColorFormat::GRAY;
+            break;
+    }
+
+    return format;
+}

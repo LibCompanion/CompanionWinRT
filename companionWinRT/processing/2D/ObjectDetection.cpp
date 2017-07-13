@@ -21,7 +21,7 @@
 
 using namespace CompanionWinRT;
 
-ObjectDetection::ObjectDetection(CPUFeatureMatching^ feature, float scale)
+ObjectDetection::ObjectDetection(FeatureMatching^ feature, float scale)
 {
     if (feature != nullptr)
     {

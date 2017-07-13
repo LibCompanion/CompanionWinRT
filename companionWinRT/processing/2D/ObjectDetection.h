@@ -21,7 +21,7 @@
 #include <companion\Configuration.h>
 #include <companion\processing\2D\ObjectDetection.h>
 
-#include "companionWinRT\algo\CPUFeatureMatching.h"
+#include "companionWinRT\algo\2D\FeatureMatching.h"
 
 namespace CompanionWinRT
 {
@@ -54,7 +54,7 @@ namespace CompanionWinRT
          *
          * @param feature       Image recognition algorithm to use, for example feature matching.
          */
-        ObjectDetection(CPUFeatureMatching^ feature) : ObjectDetection(feature, 0.5F)
+        ObjectDetection(FeatureMatching^ feature) : ObjectDetection(feature, 1.0f)
         {};
 
         /**
@@ -71,7 +71,7 @@ namespace CompanionWinRT
          * @param feature       Image recognition algorithm to use, for example feature matching.
          * @param scale         scaling factor of frames
          */
-        ObjectDetection(CPUFeatureMatching^ feature, float scale);
+        ObjectDetection(FeatureMatching^ feature, float scale);
 
         /**
          * Destructs this instance.
@@ -95,7 +95,7 @@ namespace CompanionWinRT
          * ToDo:
          * User should be able to choose between different image recognition algorithms. This is a minimum construction.
          */
-        CPUFeatureMatching^ feature;
+        FeatureMatching^ feature;
 
         /**
          * Scaling factor for frames.

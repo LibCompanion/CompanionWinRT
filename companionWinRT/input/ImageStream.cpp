@@ -32,9 +32,14 @@ ImageStream::~ImageStream()
     this->imageStreamObj = nullptr;
 }
 
-void ImageStream::addImage(Platform::String^ imgPath)
+bool ImageStream::addImage(Platform::String^ imgPath)
 {
-    this->imageStreamObj->addImage(ps2ss(imgPath));
+    return this->imageStreamObj->addImage(ps2ss(imgPath));
+}
+
+bool ImageStream::addImage(int width, int height, int type, const Platform::Array<uint8>^ data)
+{
+    return this->imageStreamObj->addImage(width, height, type, data->Data, ps2ss(Windows::Storage::ApplicationData::Current->LocalFolder->Path));
 }
 
 Companion::Input::Stream* ImageStream::getStream()

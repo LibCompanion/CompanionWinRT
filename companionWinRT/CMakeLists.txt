@@ -19,7 +19,7 @@
 # Add source files
 SET(SOURCE
     Configuration.cpp Configuration.h
-    algo/CPUFeatureMatching.cpp algo/CPUFeatureMatching.h
+    algo/2D/FeatureMatching.cpp algo/2D/FeatureMatching.h
     draw/Frame.cpp draw/Frame.h
     model/processing/FeatureMatchingModel.cpp model/processing/FeatureMatchingModel.h
     model/result/Result.cpp model/result/Result.h

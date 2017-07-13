@@ -29,8 +29,9 @@ void Configuration::setProcessing(ObjectDetection^ detection)
     this->configurationObj.setProcessing(this->detection->getProcessing(&this->configurationObj));
 }
 
-void Configuration::setResultCallback(ResultDelegate^ callback)
+void Configuration::setResultCallback(ResultDelegate^ callback, ColorFormat colorFormat)
 {
+    Companion::ColorFormat colorForm = getColorFormat(colorFormat);
     this->configurationObj.setResultHandler([callback](std::vector<Companion::Model::Result*> results, cv::Mat image)
     {
         Platform::Collections::Vector<Result^>^ resultsCX = ref new Platform::Collections::Vector<Result^>();
@@ -66,21 +67,16 @@ void Configuration::setResultCallback(ResultDelegate^ callback)
             resultsCX->Append(resultCX);
         }
 
-        // Add alpha channel (required for WritableBitmap)
-        cv::Mat markedImage = cv::Mat(image.rows, image.cols, CV_8UC4);
-        cv::cvtColor(image, markedImage, CV_BGR2BGRA);
-
         // Copy image data to a byte[] so it can be passed across the ABI
-        Platform::Array<uint8>^ imageData = ref new Platform::Array<uint8>(markedImage.data, markedImage.step.buf[1] * markedImage.cols * markedImage.rows);
+        Platform::Array<uint8>^ imageData = ref new Platform::Array<uint8>(image.data, image.step.buf[1] * image.cols * image.rows);
 
         // Invoke callback
         callback->Invoke(resultsCX, imageData);
 
         // Release data
         image.release();
-        markedImage.release();
         results.clear();
-    });
+    }, colorForm);
 }
 
 void Configuration::setErrorCallback(ErrorDelegate^ callback)
@@ -94,6 +90,11 @@ void Configuration::setErrorCallback(ErrorDelegate^ callback)
 void Configuration::setSkipFrame(int skipFrame)
 {
     this->configurationObj.setSkipFrame(skipFrame);
+}
+
+void Configuration::setImageBuffer(int imageBuffer)
+{
+    this->configurationObj.setImageBuffer(imageBuffer);
 }
 
 int Configuration::getSkipFrame()
@@ -124,9 +125,7 @@ void Configuration::addModel(FeatureMatchingModel^ model)
 
 void Configuration::run()
 {
-    std::queue<cv::Mat> queue;
-    Companion::Thread::StreamWorker ps(queue);
-    this->configurationObj.run(ps);
+    this->configurationObj.run();
 }
 
 void Configuration::stop()

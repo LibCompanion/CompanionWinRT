@@ -51,8 +51,20 @@ namespace CompanionWinRT
              * Load an image that is going to be processed.
              *
              * @param imgPath   path of the image that is going to be processed
+             * @return <code>true</code> if image was added successfully, <code>false</code> otherwise
              */
-            void addImage(Platform::String^ imgPath);
+            bool addImage(Platform::String^ imgPath);
+
+            /**
+             * Load an image that is going to be processed.
+             *
+             * @param width     width of the image that is going to be processed
+             * @param height    height of the image that is going to be processed
+             * @param type      type of the image that is going to be processed (i.e. OpenCV image types)
+             * @param data      data of the image that is going to be processed
+             * @return <code>true</code> if image was added successfully, <code>false</code> otherwise
+             */
+            bool addImage(int width, int height, int type, const Platform::Array<uint8>^ data);
 
         private:
 

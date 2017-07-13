@@ -18,8 +18,30 @@
 
 #pragma once
 
+#include <companion/util/Util.h>
+
 namespace CompanionWinRT
 {
+    /**
+     * Enumeration class for color formats.
+     */
+    public enum class ColorFormat
+    {
+        RGB,
+        RGBA,
+        BGR,
+        BGRA,
+        GRAY
+    };
+
+    /**
+     * Returns the Companion color format for the given WinRT color format.
+     *
+     * @param colorFormat   WinRT color format
+     * @return Comanion color format
+     */
+    Companion::ColorFormat getColorFormat(ColorFormat colorFormat);
+
     std::string StrToWStr(Platform::String^ input);
     //cv::String ConvertPath(Platform::String^ path);
 
