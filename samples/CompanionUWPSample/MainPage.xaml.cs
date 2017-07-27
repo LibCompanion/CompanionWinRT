@@ -1,7 +1,5 @@
 ﻿/*
- * This program is a C#/UWP sample app for the Companion WinRT wrapper.
- *          https://github.com/LibCompanion/libCompanion
- *
+ * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
  * Copyright (C) 2017 Dimitri Kotlovsky
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,8 +27,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Storage.FileProperties;
 using System.Threading.Tasks;
 
-namespace CompanionUWPSample
-{
+namespace CompanionUWPSample {
     using System.IO;
     using System.Runtime.InteropServices.WindowsRuntime;
     using Windows.Storage.Streams;
@@ -39,8 +36,7 @@ namespace CompanionUWPSample
     /**
      * This is the main page of the test application for the Companion library WinRT wrapper.
      */
-    public sealed partial class MainPage : Page
-    {
+    public sealed partial class MainPage : Page {
         /**
          * A reference to the 'Assets' folder of this app (read only).
          */
@@ -79,8 +75,7 @@ namespace CompanionUWPSample
         /**
          * Constructs this main page.
          */
-        public MainPage()
-        {
+        public MainPage() {
             this.InitializeComponent();
             Reset();
             this.isRunning = false;
@@ -95,45 +90,35 @@ namespace CompanionUWPSample
          * 
          * @param e navigation event data
          */
-        async protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
+        async protected override void OnNavigatedTo(NavigationEventArgs e) {
             // Initialize the 'Assets' folder
-            try
-            {
+            try {
                 this.assets = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
-            }
-            catch (System.IO.FileNotFoundException ex)
-            {
+            } catch (System.IO.FileNotFoundException ex) {
                 this.UpdateUIOutput("No 'Assets' folder found.");
                 return;
             }
 
             // Initialize the image source folder
-            try
-            {
+            try {
                 //this.imageFolder = await this.assets.GetFolderAsync("Muelheim_HBF");
                 //this.imageFolder = await this.assets.GetFolderAsync("Labor");
                 this.imageFolder = await this.assets.GetFolderAsync("images");
-            }
-            catch (System.IO.FileNotFoundException ex)
-            {
+            } catch (System.IO.FileNotFoundException ex) {
                 this.UpdateUIOutput("No image source folder found.");
                 return;
             }
 
             // Get the size of the images for the WriteableBitmap constructor.
-            try
-            {
+            try {
                 IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
                 StorageFile file = fileList[0];
                 ImageProperties props = await file.Properties.GetImagePropertiesAsync();
-                this.m_bm = new WriteableBitmap((int)props.Width, (int)props.Height);
+                this.m_bm = new WriteableBitmap((int) props.Width, (int) props.Height);
                 m_bm.SetSource(await file.OpenReadAsync());
                 this.image.Source = m_bm;
                 this.isReady = true;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 this.UpdateUIOutput("Image sources not found.");
             }
         }
@@ -144,14 +129,11 @@ namespace CompanionUWPSample
          * @param sender    sender of the event
          * @param e         routed event data
          */
-        private async void startButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!this.isRunning && isReady)
-            {
+        private async void startButton_Click(object sender, RoutedEventArgs e) {
+            if (!this.isRunning && isReady) {
                 this.isRunning = true;
 
-                try
-                {
+                try {
                     // Create a configuration object of the Companion library
                     await this.CreateConfiguration();
 
@@ -159,16 +141,14 @@ namespace CompanionUWPSample
                     //this.CreateBitmap(new Uri(this.imageSourceURI, "Muelheim_HBF 001.jpg"));
 
                     // Constantly import images as the source for processing
-                    this.m_workItem = Windows.System.Threading.ThreadPool.RunAsync(async (workItem) =>
-                    {
+                    this.m_workItem = Windows.System.Threading.ThreadPool.RunAsync(async (workItem) => {
                         // Save the source image paths to a list for the 'ImageStream' object
                         IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
 
                         // Stop loading images if the processing was canceled
                         bool canceled = false;
 
-                        for (int i = 0; (i < fileList.Count) && !canceled; i++)
-                        {
+                        for (int i = 0; (i < fileList.Count) && !canceled; i++) {
                             // Use this control to adjust the streaming rate
                             //await Task.Delay(TimeSpan.FromSeconds(2));
 
@@ -206,14 +186,10 @@ namespace CompanionUWPSample
                     //    }));
                     //});
 
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     this.handleException(ex);
                 }
-            }
-            else if (this.isReady)
-            {
+            } else if (this.isReady) {
                 this.UpdateUIOutput("Processing has already started.");
             }
         }
@@ -224,18 +200,13 @@ namespace CompanionUWPSample
          * @param sender    sender of the event
          * @param e         routed event data
          */
-        private async void cancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.isRunning)
-            {
-                try
-                {
+        private async void cancelButton_Click(object sender, RoutedEventArgs e) {
+            if (this.isRunning) {
+                try {
                     await this.StopCompanion();
                     this.UpdateUIOutput("Processing has been stopped.");
                     this.isRunning = false;
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     this.handleException(ex);
                 }
             }
@@ -246,17 +217,15 @@ namespace CompanionUWPSample
          * 
          * @return Returns a 'Configuration' wrapper object asynchronously.
          */
-        private IAsyncAction CreateConfiguration()
-        {
-            return Task.Run(async () =>
-            {
+        private IAsyncAction CreateConfiguration() {
+            return Task.Run(async () => {
                 this.configuration = new CW.Configuration();
 
                 // Configure image recognition
                 CW.FeatureMatching feature = new CW.FeatureMatching(CW.FeatureDetector.BRISK, CW.DescriptorMatcher.BRUTEFORCE_HAMMING);
 
                 // Configure image processing
-                CW.ObjectDetection objectDetection = new CW.ObjectDetection(feature, 0.3f);
+                CW.ObjectDetection objectDetection = new CW.ObjectDetection(feature, CW.Scaling.SCALE_960x540);
                 this.configuration.setProcessing(objectDetection);
 
                 // Set callback methods (result image should have an alpha channel (required for WritableBitmap))
@@ -299,29 +268,21 @@ namespace CompanionUWPSample
          * @param results   list of results that represent the detected objects
          * @param image     the processed image with visually markers for the detected objects
          */
-        public void ResultCallback(IList<CW.Result> results, byte[] image)
-        {
-            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
-            {
-                try
-                {
-                    using (Stream stream = this.m_bm.PixelBuffer.AsStream())
-                    {
-                        if (stream.CanWrite)
-                        {
+        public void ResultCallback(IList<CW.Result> results, byte[] image) {
+            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () => {
+                try {
+                    using (Stream stream = this.m_bm.PixelBuffer.AsStream()) {
+                        if (stream.CanWrite) {
                             await stream.WriteAsync(image, 0, image.Length);
                             stream.Flush();
                         }
                     }
                     this.m_bm.Invalidate();
-                    for (int i = 0; i < results.Count; i++)
-                    {
+                    for (int i = 0; i < results.Count; i++) {
                         CW.Point upperLeftCorner = results[i].getFrame().getUpperLeftCorner();
                         this.UpdateUIOutput("Obj " + i + ": x_" + upperLeftCorner.x + ", y_" + upperLeftCorner.y);
                     }
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     this.UpdateUIOutput(ex.Message);
                 }
 
@@ -333,10 +294,8 @@ namespace CompanionUWPSample
          * 
          * @param errorMessage  a specific error message
          */
-        public void ErrorCallback(String errorMessage)
-        {
-            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
+        public void ErrorCallback(String errorMessage) {
+            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
                 this.UpdateUIOutput(errorMessage);
             });
         }
@@ -347,10 +306,8 @@ namespace CompanionUWPSample
          * @param config    a 'Configuration' wrapper object
          * @return Returns a awaitable asynchronous action.
          */
-        private IAsyncAction RunCompanion()
-        {
-            return Task.Run(() =>
-            {
+        private IAsyncAction RunCompanion() {
+            return Task.Run(() => {
                 this.configuration.run();
             }).AsAsyncAction();
         }
@@ -361,10 +318,8 @@ namespace CompanionUWPSample
          * @param config    a 'Configuration' wrapper object
          * @return Returns a awaitable asynchronous action.
          */
-        private IAsyncAction StopCompanion()
-        {
-            return Task.Run(() =>
-            {
+        private IAsyncAction StopCompanion() {
+            return Task.Run(() => {
                 this.configuration.stop();
             }).AsAsyncAction();
         }
@@ -374,18 +329,14 @@ namespace CompanionUWPSample
          * 
          * @param ex    exception that was thrown
          */
-        private void handleException(Exception ex)
-        {
+        private void handleException(Exception ex) {
             String message = "";
             Type errorType = typeof(CW.ErrorCode);
 
-            if (Enum.IsDefined(errorType, ex.HResult))
-            {
-                CW.ErrorCode errorCode = (CW.ErrorCode)Enum.ToObject(errorType, ex.HResult);
-                message = CW.CompanionErrorUWP.getError(errorCode);
-            }
-            else
-            {
+            if (Enum.IsDefined(errorType, ex.HResult)) {
+                CW.ErrorCode errorCode = (CW.ErrorCode) Enum.ToObject(errorType, ex.HResult);
+                message = CW.CompanionError.getError(errorCode);
+            } else {
                 message = ex.Message;
             }
 
@@ -397,16 +348,14 @@ namespace CompanionUWPSample
          * 
          * @param s message that should be displayed for the user
          */
-        private void UpdateUIOutput(String s)
-        {
+        private void UpdateUIOutput(String s) {
             this.textBlock.Text += s + "\n";
         }
 
         /**
          * Reset UI output.
          */
-        public void Reset()
-        {
+        public void Reset() {
             this.UpdateUIOutput("Output:\n");
         }
 

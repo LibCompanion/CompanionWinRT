@@ -21,12 +21,12 @@
 
 using namespace CompanionWinRT;
 
-ObjectDetection::ObjectDetection(FeatureMatching^ feature, float scale)
+ObjectDetection::ObjectDetection(FeatureMatching^ feature, Scaling scaling)
 {
     if (feature != nullptr)
     {
         this->feature = feature;
-        this->scale = scale;
+        this->scaling = scaling;
     }
     else
     {
@@ -49,7 +49,7 @@ Companion::Processing::ImageProcessing* ObjectDetection::getProcessing(Companion
         throw ref new Platform::Exception(hresult);
     }
 
-    this->objectDetectionObj = new Companion::Processing::ObjectDetection(configuration, feature->getRecognition(), scale);
+    this->objectDetectionObj = new Companion::Processing::ObjectDetection(configuration, this->feature->getRecognition(), getScaling(this->scaling));
 
     return this->objectDetectionObj;
 }

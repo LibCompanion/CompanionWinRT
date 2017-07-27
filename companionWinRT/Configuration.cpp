@@ -41,6 +41,7 @@ void Configuration::setResultCallback(ResultDelegate^ callback, ColorFormat colo
         Companion::Model::Result* result;
         Companion::Draw::Frame* frame;
 
+        // Process all positive results
         for (size_t i = 0; i < results.size(); i++)
         {
             result = results.at(i);

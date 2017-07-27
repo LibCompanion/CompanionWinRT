@@ -35,32 +35,54 @@ namespace CompanionWinRT
     };
 
     /**
-     * Returns the Companion color format for the given WinRT color format.
+     * Enumeration class for scaling.
+     */
+    public enum class Scaling
+    {
+        SCALE_2048x1152,
+        SCALE_1920x1080,
+        SCALE_1600x900,
+        SCALE_1408x792,
+        SCALE_1344x756,
+        SCALE_1280x720,
+        SCALE_1152x648,
+        SCALE_1024x576,
+        SCALE_960x540,
+        SCALE_896x504,
+        SCALE_800x450,
+        SCALE_768x432,
+        SCALE_640x360
+    };
+
+    /**
+     * Returns the Companion color format for the given winRT color format.
      *
-     * @param colorFormat   WinRT color format
-     * @return Comanion color format
+     * @param colorFormat   WinRT color format.
+     * @return Companion color format.
      */
     Companion::ColorFormat getColorFormat(ColorFormat colorFormat);
 
-    std::string StrToWStr(Platform::String^ input);
-    //cv::String ConvertPath(Platform::String^ path);
+    /**
+     * Returns the Companion scaling value for the given winRT scaling value.
+     *
+     * @param scaling   WinRT scaling value.
+     * @return Companion scaling value.
+     */
+    Companion::SCALING getScaling(Scaling scaling);
 
     /**
      * Converts std::string to Platform::String.
      *
-     * @param s The std::string to convert.
-     * @return WinRT compatible String.
+     * @param str   the std::string to be converted
+     * @return winRT compatible Platform::String
      */
-    Platform::String^ ss2ps(const std::string& s);
+    Platform::String^ ss2ps(const std::string& str);
 
     /**
      * Converts Platform::String to std::string.
      *
-     * @param s The Platform::String to convert.
-     * @return std::string.
+     * @param str   the Platform::String to be converted
+     * @return native c++ compatible std::string
      */
     std::string ps2ss(Platform::String^ str);
 }
-
-std::wstring s2ws(const std::string& str);
-std::string ws2s(const std::wstring& wstr);

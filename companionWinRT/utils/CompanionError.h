@@ -66,7 +66,7 @@ namespace CompanionWinRT
      *
      * @author Dimitri Kotlovsky
      */
-    public ref class CompanionErrorUWP sealed
+    public ref class CompanionError sealed
     {
         public:
 
@@ -140,7 +140,7 @@ namespace CompanionWinRT
             }
 
         private:
-            CompanionErrorUWP(); // This type can't be constructed
+            CompanionError(); // This class can't be constructed
     };
 
     /**
