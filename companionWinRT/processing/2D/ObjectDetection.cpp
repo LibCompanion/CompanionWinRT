@@ -21,11 +21,11 @@
 
 using namespace CompanionWinRT;
 
-ObjectDetection::ObjectDetection(FeatureMatching^ feature, Scaling scaling)
+ObjectDetection::ObjectDetection(FeatureMatching^ matchingAlgo, Scaling scaling)
 {
-    if (feature != nullptr)
+    if (matchingAlgo != nullptr)
     {
-        this->feature = feature;
+        this->matchingAlgo = matchingAlgo;
         this->scaling = scaling;
     }
     else
@@ -43,13 +43,13 @@ ObjectDetection::~ObjectDetection()
 
 Companion::Processing::ImageProcessing* ObjectDetection::getProcessing(Companion::Configuration* configuration)
 {
-    if ((configuration == nullptr) || (this->feature == nullptr))
+    if ((configuration == nullptr) || (this->matchingAlgo == nullptr))
     {
         int hresult = static_cast<int>(ErrorCode::config_or_recognition_not_found);
         throw ref new Platform::Exception(hresult);
     }
 
-    this->objectDetectionObj = new Companion::Processing::ObjectDetection(configuration, this->feature->getRecognition(), getScaling(this->scaling));
+    this->objectDetectionObj = new Companion::Processing::ObjectDetection(configuration, this->matchingAlgo->getMatching(), getScaling(this->scaling));
 
     return this->objectDetectionObj;
 }

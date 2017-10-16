@@ -119,6 +119,6 @@ namespace CompanionWinRT
              *
              * @return Pointer to the native 'ImageRecognition' object
              */
-            Companion::Algorithm::ImageRecognition* getRecognition();
+            Companion::Algorithm::Matching* getMatching();
     };
 }

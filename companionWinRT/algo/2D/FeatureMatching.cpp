@@ -56,7 +56,7 @@ FeatureMatching::~FeatureMatching()
     this->featureMatchingObj = nullptr;
 }
 
-Companion::Algorithm::ImageRecognition* FeatureMatching::getRecognition()
+Companion::Algorithm::Matching* FeatureMatching::getMatching()
 {
     return this->featureMatchingObj;
 }

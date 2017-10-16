@@ -53,9 +53,9 @@ namespace CompanionWinRT
          * ToDo:
          * User should be able to choose between different image recognition algorithms. This is a minimum construction.
          *
-         * @param feature       Image recognition algorithm to use, for example feature matching.
+         * @param matchingAlgo  Matching algorithm to use, for example feature matching.
          */
-        ObjectDetection(FeatureMatching^ feature) : ObjectDetection(feature, Scaling::SCALE_1920x1080)
+        ObjectDetection(FeatureMatching^ matchingAlgo) : ObjectDetection(matchingAlgo, Scaling::SCALE_1920x1080)
         {};
 
         /**
@@ -69,10 +69,10 @@ namespace CompanionWinRT
          * ToDo:
          * User should be able to choose between different image recognition algorithms. This is a minimum construction.
          *
-         * @param feature       Image recognition algorithm to use, for example feature matching.
+         * @param matchingAlgo  Matching algorithm to use, for example feature matching.
          * @param scaling       Scaling resolution for image processing.
          */
-        ObjectDetection(FeatureMatching^ feature, Scaling scaling);
+        ObjectDetection(FeatureMatching^ matchingAlgo, Scaling scaling);
 
         /**
          * Destructs this instance.
@@ -87,16 +87,16 @@ namespace CompanionWinRT
         Companion::Processing::ObjectDetection* objectDetectionObj;
 
         /**
-         * A handle to the desired image recognition algorithm.
+         * A handle to the desired matching algorithm.
          *
          * Note:
          * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-         * plausible abstract class 'ImageProcessing' for this wrapper.
+         * plausible abstract class 'Matching' for this wrapper.
          *
          * ToDo:
-         * User should be able to choose between different image recognition algorithms. This is a minimum construction.
+         * User should be able to choose between different matching algorithms. This is a minimum construction.
          */
-        FeatureMatching^ feature;
+        FeatureMatching^ matchingAlgo;
 
         /**
          * Scaling resolution for image processing.

@@ -14,9 +14,11 @@ Windows Runtime Component wrapper for [libCompanion](https://github.com/LibCompa
 ## Getting started
 
 Feel free to use the provided sample app as a starting point. Unfortunately CMake is currently not able to integrate the C# project to the generated Visual Studio Solution automatically. Follow these steps to do that manually:
+
 1. Open the generated project file `CompanionWinRT.sln` in Visual Studio.
 2. Go to `File` > `Open` > `Project/Solution...`, select the project file `<build_dir>\CompanionUWPSample\CompanionUWPSample.csproj` and choose `Add to Solution`.
 > Be aware that the sample project is being copied to the build directory so it won't be under version control.
+
 3. Add the `CompanionWinRT` project as a reference to the `CompanionUWPSample` project: right click on the project name and choose `Add` > `Reference...`.
 4. Right click on `CompanionUWPSample` and choose `Set as StartUp Project`.
 5. Add your own image samples and an image source folder to the project assets (video is not supported at the moment).
