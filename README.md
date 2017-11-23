@@ -1,6 +1,6 @@
 # companionWinRT
 
-Windows Runtime Component wrapper for [libCompanion](https://github.com/LibCompanion/libCompanion/). Since the WinRT Component uses C++/CX it can be used in *Universal Windows Platform* (UWP) apps that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
+Windows Runtime Component wrapper for [Companion](https://github.com/LibCompanion/libCompanion/). Since the WinRT Component uses C++/CX it can be used in *Universal Windows Platform* (UWP) apps that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
 
 ## Dependencies
 
@@ -27,7 +27,7 @@ Feel free to use the provided sample app as a starting point. Unfortunately CMak
 ## License
 
 ```
-CompanionWinRT is a Windows Runtime wrapper for libCompanion.
+CompanionWinRT is a Windows Runtime wrapper for Companion.
 Copyright (C) 2017 Dimitri Kotlovsky
 
 This program is free software: you can redistribute it and/or modify
