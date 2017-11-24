@@ -16,7 +16,7 @@ Windows Runtime Component wrapper for [Companion](https://github.com/LibCompanio
 Feel free to use the provided sample app as a starting point. Unfortunately CMake is currently not able to integrate the C# project to the generated Visual Studio Solution automatically. Follow these steps to do that manually:
 
 1. Open the generated project file `CompanionWinRT.sln` in Visual Studio.
-2. Go to `File` > `Open` > `Project/Solution...`, select the project file `<build_dir>\CompanionUWPSample\CompanionUWPSample.csproj` and choose `Add to Solution`.
+2. Go to `File` > `Add` > `Existing Project...` and select the project file `<build_dir>\CompanionUWPSample\CompanionUWPSample.csproj`.
 > Be aware that the sample project is being copied to the build directory so it won't be under version control.
 
 3. Add the `CompanionWinRT` project as a reference to the `CompanionUWPSample` project: right click on the project name and choose `Add` > `Reference...`.
