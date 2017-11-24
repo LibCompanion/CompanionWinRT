@@ -18,12 +18,14 @@
 
 #pragma once
 
+#include <collection.h>
 #include "processing\2D\ObjectDetection.h"
 #include "input\ImageStream.h"
 #include "model\processing\FeatureMatchingModel.h"
 #include "model\result\Result.h"
 #include "utils\CompanionUtils.h"
 
+using namespace Platform::Collections;
 using namespace Windows::Foundation::Collections;
 
 namespace CompanionWinRT
@@ -137,6 +139,30 @@ namespace CompanionWinRT
             void addModel(FeatureMatchingModel^ model);
 
             /**
+             * Returns a vector of all feature mathing models.
+             *
+             * @return all feature mathing models
+             *
+             * Note:
+             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
+             * plausible abstract class 'ImageRecognitionModel' for this wrapper. This is a minimum construct and has to be
+             * further developed to provide the same flexability as the Companion native code.
+             */
+            IVector<FeatureMatchingModel^>^ getModels();
+
+            /**
+             * Removes the given model form image processing. This function can only be used safetly while companion is not processing.
+             *
+             * @param modelID   ID of the model
+             */
+            void removeModel(int modelID);
+
+            /**
+             * Clears all image processing models.
+             */
+            void clearModels();
+
+            /**
              * Starts processing of the Companion library.
              */
             void run();
@@ -176,6 +202,6 @@ namespace CompanionWinRT
             /**
              * A collection of all feature matching models.
              */
-            std::vector<FeatureMatchingModel^> models;
-        };
+            Vector<FeatureMatchingModel^>^ models = ref new Vector<FeatureMatchingModel^>();
+    };
 }

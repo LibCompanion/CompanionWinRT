@@ -20,8 +20,8 @@
 
 using namespace CompanionWinRT;
 
-FeatureMatching::FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures,
-                                 int countMatches, bool useIRA)
+FeatureMatching::FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures, int minSideLength,
+                                 int countMatches, bool useIRA, double reprojThreshold, int ransacMaxIters, EstimationAlgorithm findHomographyMethod)
 {
     // Create descriptor matcher
     int type = (int) matcherType;
@@ -32,11 +32,13 @@ FeatureMatching::FeatureMatching(FeatureDetector detector, DescriptorMatcher mat
     {
         case FeatureDetector::BRISK :
             this->feature = cv::BRISK::create(thresh);
-            this->featureMatchingObj = new Companion::Algorithm::FeatureMatching(this->feature, this->feature, this->matcher, type, countMatches, useIRA);
+            this->featureMatchingObj = new Companion::Algorithm::FeatureMatching(this->feature, this->feature, this->matcher, type, minSideLength, countMatches,
+                                                                                 useIRA, reprojThreshold, ransacMaxIters, (int) findHomographyMethod);
             break;
         case FeatureDetector::ORB :
             this->feature = cv::ORB::create(nfeatures);
-            this->featureMatchingObj = new Companion::Algorithm::FeatureMatching(this->feature, this->feature, this->matcher, type);
+            this->featureMatchingObj = new Companion::Algorithm::FeatureMatching(this->feature, this->feature, this->matcher, type, minSideLength, countMatches,
+                                                                                 useIRA, reprojThreshold, ransacMaxIters, (int) findHomographyMethod);
             break;
         default:
             break;

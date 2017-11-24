@@ -45,6 +45,16 @@ namespace CompanionWinRT
     };
 
     /**
+     * OpenCV estimation algorithm types.
+     */
+    public enum class EstimationAlgorithm
+    {
+        LMEDS = cv::LMEDS,
+        RANSAC = cv::RANSAC,
+        RHO = cv::RHO
+    };
+
+    /**
      * This class provides a WinRT wrapper for the 'FeatureMatching' functionality of the Companion project (CPU only).
      *
      * Note 1:
@@ -67,21 +77,25 @@ namespace CompanionWinRT
              * @param matcherType   type of the desired descriptor matcher
              */
             FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType)
-                : FeatureMatching(detector, matcherType, 60, 2000, 40, true)
+                : FeatureMatching(detector, matcherType, 60, 2000, 10, 40, true, 3.0, 500, EstimationAlgorithm::RANSAC)
             {};
 
             /**
              * Creates an 'FeatureMatching' wrapper with the provided feature matching algorithm.
              *
-             * @param detector      desired feature detector
-             * @param matcherType   type of the desired descriptor matcher
-             * @param thresh        (used by BRISK) AGAST detection threshold score
-             * @param nfeatures     (used by ORB) The maximum number of features to retain
-             * @param countMatches  how many matches should be found for a good matching result
-             * @param useIRA        indicator to use IRA algorithm to use last detected objects from last scene
+             * @param detector              desired feature detector
+             * @param matcherType           type of the desired descriptor matcher
+             * @param thresh                (used by BRISK) AGAST detection threshold score
+             * @param nfeatures             (used by ORB) The maximum number of features to retain
+             * @param minSideLength         minimum length of the detected area's sides (in pixels)
+             * @param countMatches          how many matches should be found for a good matching result
+             * @param useIRA                indicator to use IRA algorithm to use last detected objects from last scene
+             * @param reprojThreshold       homography parameter: maximum allowed reprojection error to treat a point pair as an inlier
+             * @param ransacMaxIters        homography parameter: maximum number of RANSAC iterations (2000 is the maximum)
+             * @param findHomographyMethod  method used to compute a homography matrix
              */
-            FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures,
-                            int countMatches, bool useIRA);
+            FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures, int minSideLength,
+                            int countMatches, bool useIRA, double reprojThreshold, int ransacMaxIters, EstimationAlgorithm findHomographyMethod);
 
             /**
              * Destructs this instance.

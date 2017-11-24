@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <collection.h>
+#include <codecvt>
 
 #include "Configuration.h"
 #include "utils\CompanionError.h"
@@ -34,7 +34,7 @@ void Configuration::setResultCallback(ResultDelegate^ callback, ColorFormat colo
     Companion::ColorFormat colorForm = getColorFormat(colorFormat);
     this->configurationObj.setResultHandler([callback](std::vector<Companion::Model::Result*> results, cv::Mat image)
     {
-        Platform::Collections::Vector<Result^>^ resultsCX = ref new Platform::Collections::Vector<Result^>();
+        Vector<Result^>^ resultsCX = ref new Vector<Result^>();
         Result^ resultCX;
         Frame^ frameCX;
 
@@ -116,12 +116,35 @@ ImageStream^ Configuration::getSource()
 
 void Configuration::addModel(FeatureMatchingModel^ model)
 {
-    this->models.push_back(model);
+    this->models->Append(model);
     if (!this->configurationObj.addModel(model->getModel()))
     {
         int hresult = static_cast<int>(ErrorCode::model_not_added);
         throw ref new Platform::Exception(hresult);
     }
+}
+
+IVector<FeatureMatchingModel^>^ Configuration::getModels()
+{
+    return this->models;
+}
+
+void Configuration::removeModel(int modelID)
+{
+    for (int i = 0; i < this->models->Size; i++)
+    {
+        if (this->models->GetAt(i)->getModel()->getID() == modelID)
+        {
+            this->configurationObj.removeModel(modelID);
+            this->models->RemoveAt(i);
+        }
+    }
+}
+
+void Configuration::clearModels()
+{
+    this->configurationObj.clearModels();
+    this->models->Clear();
 }
 
 void Configuration::run()
