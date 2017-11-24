@@ -17,21 +17,20 @@
  */
 
 using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.Collections.Generic;
-using Windows.Foundation;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage;
 using Windows.UI.Xaml;
+using Windows.Foundation;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.FileProperties;
-using System.Threading.Tasks;
+using CW = CompanionWinRT;
 
 namespace CompanionUWPSample {
-    using System.IO;
-    using System.Runtime.InteropServices.WindowsRuntime;
-    using Windows.Storage.Streams;
-    using CW = CompanionWinRT;
 
     /**
      * This is the main page of the test application for the Companion library WinRT wrapper.
@@ -77,7 +76,7 @@ namespace CompanionUWPSample {
          */
         public MainPage() {
             this.InitializeComponent();
-            Reset();
+            this.Reset();
             this.isRunning = false;
             this.isReady = false;
         }
@@ -142,6 +141,7 @@ namespace CompanionUWPSample {
 
                     // Constantly import images as the source for processing
                     this.m_workItem = Windows.System.Threading.ThreadPool.RunAsync(async (workItem) => {
+                        
                         // Save the source image paths to a list for the 'ImageStream' object
                         IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
 
@@ -218,7 +218,7 @@ namespace CompanionUWPSample {
          * @return Returns a 'Configuration' wrapper object asynchronously.
          */
         private IAsyncAction CreateConfiguration() {
-            return Task.Run(async () => {
+            return Task.Run(() => {
                 this.configuration = new CW.Configuration();
 
                 // Configure image recognition
@@ -247,17 +247,16 @@ namespace CompanionUWPSample {
                  **********************************************************/
 
                 // Create feature matching models
-                //CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Right.jpg", 0);
-                //CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Middle.jpg", 1);
-                //CW.FeatureMatchingModel model3 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Left.jpg", 2);
-                //CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster.jpg", 0);
-                CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster_left.jpg", 0);
-                CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster_right.jpg", 1);
+                //CW.FeatureMatchingModel model0 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Right.jpg", 0);
+                //CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Middle.jpg", 1);
+                //CW.FeatureMatchingModel model2 = new CW.FeatureMatchingModel(this.assets.Path + "\\Sample_Left.jpg", 2);
+                CW.FeatureMatchingModel model0 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster_left.jpg", 0);
+                CW.FeatureMatchingModel model1 = new CW.FeatureMatchingModel(this.assets.Path + "\\poster_right.jpg", 1);
 
                 // Add feature matching models
-                //this.configuration.addModel(model1);
-                this.configuration.addModel(model2);
-                //this.configuration.addModel(model3);
+                this.configuration.addModel(model0);
+                this.configuration.addModel(model1);
+                //this.configuration.addModel(model2);
 
             }).AsAsyncAction();
         }
@@ -286,7 +285,7 @@ namespace CompanionUWPSample {
                     this.UpdateUIOutput(ex.Message);
                 }
 
-            });
+            }).AsTask();
         }
 
         /**
@@ -297,7 +296,7 @@ namespace CompanionUWPSample {
         public void ErrorCallback(String errorMessage) {
             Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
                 this.UpdateUIOutput(errorMessage);
-            });
+            }).AsTask();
         }
 
         /**

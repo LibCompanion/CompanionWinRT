@@ -60,7 +60,7 @@ namespace CompanionWinRT
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
              * plausible abstract class 'ImageProcessing' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native DLL.
+             * further developed to provide the same flexability as the Companion native code.
              */
             void setProcessing(ObjectDetection^ detection);
 
@@ -108,7 +108,7 @@ namespace CompanionWinRT
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
              * plausible abstract class 'Stream' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native DLL.
+             * further developed to provide the same flexability as the Companion native code.
              */
             void setSource(ImageStream^ stream);
 
@@ -120,7 +120,7 @@ namespace CompanionWinRT
              * Note:
              * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
              * plausible abstract class 'Stream' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native DLL.
+             * further developed to provide the same flexability as the Companion native code.
              */
             ImageStream^ getSource();
 
@@ -128,6 +128,11 @@ namespace CompanionWinRT
              * Adds a 'FeatureMatchingModel' object to this companion configuration.
              *
              * @param model a feature matching model for this companion configuration
+             *
+             * Note:
+             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
+             * plausible abstract class 'ImageRecognitionModel' for this wrapper. This is a minimum construct and has to be
+             * further developed to provide the same flexability as the Companion native code.
              */
             void addModel(FeatureMatchingModel^ model);
 

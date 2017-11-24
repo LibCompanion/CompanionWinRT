@@ -30,7 +30,7 @@ namespace CompanionWinRT
      * This class provides a WinRT wrapper for the 'ObjectDetection' functionality of the Companion project.
      *
      * Note 1:
-     * This is a minimum construction -- it has to be extended to provide the same flexability as the Companion native DLL.
+     * This is a minimum construction -- it has to be extended to provide the same flexability as the Companion native code.
      *
      * Note 2:
      * Public inheritance is not possible in a Windows Runtime context (with very few exceptions). We can not mirror the
