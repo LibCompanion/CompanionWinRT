@@ -1,4 +1,4 @@
-# companionWinRT
+# CompanionWinRT
 
 Windows Runtime Component wrapper for [Companion](https://github.com/LibCompanion/libCompanion/). Since the WinRT Component uses C++/CX it can be used in *Universal Windows Platform* (UWP) apps that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
 
@@ -6,10 +6,10 @@ Windows Runtime Component wrapper for [Companion](https://github.com/LibCompanio
 
 * OpenCV 3 for WinRT/UWP: [opencvWinRT](https://github.com/LibCompanion/opencvWinRT/)
 
-## Building companionWinRT
+## Building CompanionWinRT
 
 1. To begin with, you will need to build OpenCV 3 for WinRT/UWP: [opencvWinRT](https://github.com/LibCompanion/opencvWinRT/)
-2. Simply use cmake or cmake-gui to build companionWinRT.
+2. Simply use cmake or cmake-gui to build CompanionWinRT.
 
 ## Getting started
 
