@@ -42,7 +42,7 @@ endforeach()
 add_library(CompanionWinRT SHARED ${SOURCE})
 set_target_properties(CompanionWinRT PROPERTIES VS_WINRT_COMPONENT TRUE)
 set_target_properties(CompanionWinRT PROPERTIES VS_GLOBAL_ROOTNAMESPACE "CompanionWinRT")
-set_target_properties(CompanionWinRT PROPERTIES FOLDER "companionWinRT")
+set_target_properties(CompanionWinRT PROPERTIES FOLDER "CompanionWinRT")
 
 
 # Set linked libraries
