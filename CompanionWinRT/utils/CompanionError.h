@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ namespace CompanionWinRT
 
 
     /**
-     * Enumeration class for error codes (user defined HRESULTs).
+     * Error codes (user defined HRESULTs).
      */
     public enum class ErrorCode
     {
@@ -54,27 +54,25 @@ namespace CompanionWinRT
         no_handler_set, ///< No callback handler is set.
 
         // additional error codes
-        model_not_added, ///< Could not add model to Configuration.
-        recognition_not_found, ///< Provided handle to CPUFeatureMatching object is null (nullptr)
-        config_or_recognition_not_found, ///< Provided pointer to Configuration  or handle to CPUFeatureMatching object is null (nullptr)
-        objectdetection_not_found, ///< Provided handle to ObjectDetection object is null (nullptr)
+        model_not_added, ///< Could not add model.
+        handle_is_null, ///< Provided handle is null (nullptr)
         model_path_not_set ///< Provided handle to model path is null (nullptr)
     };
 
     /**
      * This class defines necessary functions for error handling.
      *
-     * @author Dimitri Kotlovsky
+     * @author Dimitri Kotlovsky, Andreas Sekulski
      */
     public ref class CompanionError sealed
     {
         public:
 
             /**
-             * Returns the error message of the corresponding error code.
+             * Return the error message of the corresponding error code.
              *
-             * @param code The error code
-             * @return Error message.
+             * @param code the error code
+             * @return error message
              */
             static Platform::String^ getError(ErrorCode code)
             {
@@ -84,55 +82,46 @@ namespace CompanionWinRT
                 switch (code)
                 {
                     case ErrorCode::descriptor_extractor_not_found :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::descriptor_extractor_not_found));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::descriptor_extractor_not_found));
                         break;
                     case ErrorCode::descriptor_matcher_not_found :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::descriptor_matcher_not_found));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::descriptor_matcher_not_found));
                         break;
                     case ErrorCode::dimension_error :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::dimension_error));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::dimension_error));
                         break;
                     case ErrorCode::feature_detector_not_found :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::feature_detector_not_found));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::feature_detector_not_found));
                         break;
                     case ErrorCode::image_not_found :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::image_not_found));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::image_not_found));
                         break;
                     case ErrorCode::template_dimension_error :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::template_dimension_error));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::template_dimension_error));
                         break;
                     case ErrorCode::wrong_model_type :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::wrong_model_type));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::wrong_model_type));
                         break;
                     case ErrorCode::invalid_companion_config :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::invalid_companion_config));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::invalid_companion_config));
                         break;
                     case ErrorCode::stream_src_not_set:
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::stream_src_not_set));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::stream_src_not_set));
                         break;
                     case ErrorCode::invalid_video_src :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::invalid_video_src));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::invalid_video_src));
                         break;
                     case ErrorCode::no_image_processing_algo_set :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::no_image_processing_algo_set));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::no_image_processing_algo_set));
                         break;
                     case ErrorCode::no_handler_set :
-                        error = ss2ps(Companion::Error::getError(Companion::Error::Code::no_handler_set));
+                        error = Utils::ss2ps(Companion::Error::getError(Companion::Error::Code::no_handler_set));
                         break;
                     case ErrorCode::model_not_added :
-                        error = "Could not add model to configuration.";
+                        error = "Could not add model.";
                         break;
-                    case ErrorCode::recognition_not_found :
-                        error = "The handle to the CPUFeatureMatching object is null.";
-                        break;
-                    case ErrorCode::config_or_recognition_not_found :
-                        error = "At least one of the provided pointers/handles to the 'Configuration' and 'CPUFeatureMatching' objects is null.";
-                        break;
-                    case ErrorCode::objectdetection_not_found :
-                        error = "The handle that points to the 'ObjectDetection' objects is null.";
-                        break;
-                    case ErrorCode::model_path_not_set :
-                        error = "The handle that points to the model path is null.";
+                    case ErrorCode::handle_is_null:
+                        error = "The provided handle is null (nullptr).";
                         break;
                 }
 
@@ -144,10 +133,10 @@ namespace CompanionWinRT
     };
 
     /**
-     * Returns the HRESULT error code of the corresponding Companion error code.
+     * Return the HRESULT error code of the corresponding Companion error code.
      *
-     * @param code The companion error code
-     * @return WinRT compatible HRESULT error code.
+     * @param code  the companion error code
+     * @return WinRT compatible HRESULT error code
      */
     inline ErrorCode getErrorCode(Companion::Error::Code code)
     {
@@ -195,5 +184,4 @@ namespace CompanionWinRT
 
         return error;
     }
-
 }

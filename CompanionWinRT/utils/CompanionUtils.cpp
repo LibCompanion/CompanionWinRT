@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
 
 #include "CompanionUtils.h"
 
-Companion::ColorFormat CompanionWinRT::getColorFormat(CompanionWinRT::ColorFormat colorFormat)
+using namespace CompanionWinRT;
+
+Companion::ColorFormat Utils::getColorFormat(CompanionWinRT::ColorFormat colorFormat)
 {
     Companion::ColorFormat format = Companion::ColorFormat::RGB;
 
@@ -46,7 +48,7 @@ Companion::ColorFormat CompanionWinRT::getColorFormat(CompanionWinRT::ColorForma
     return format;
 }
 
-Companion::SCALING CompanionWinRT::getScaling(CompanionWinRT::Scaling scaling)
+Companion::SCALING Utils::getScaling(CompanionWinRT::Scaling scaling)
 {
     Companion::SCALING compScaling = Companion::SCALING::SCALE_2048x1152;
 
@@ -96,13 +98,13 @@ Companion::SCALING CompanionWinRT::getScaling(CompanionWinRT::Scaling scaling)
     return compScaling;
 }
 
-Platform::String^ CompanionWinRT::ss2ps(const std::string& str)
+Platform::String^ Utils::ss2ps(const std::string& str)
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
     return ref new Platform::String(converter.from_bytes(str).c_str());
 }
 
-std::string CompanionWinRT::ps2ss(Platform::String^ str)
+std::string Utils::ps2ss(Platform::String^ str)
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
     return converter.to_bytes(str->Data());

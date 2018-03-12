@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 namespace CompanionWinRT
 {
     /**
-     * Enumeration class for color formats.
+     * Color formats.
      */
     public enum class ColorFormat
     {
@@ -35,7 +35,7 @@ namespace CompanionWinRT
     };
 
     /**
-     * Enumeration class for scaling.
+     * Scaling resolutions.
      */
     public enum class Scaling
     {
@@ -55,34 +55,46 @@ namespace CompanionWinRT
     };
 
     /**
-     * Returns the Companion color format for the given winRT color format.
-     *
-     * @param colorFormat   WinRT color format.
-     * @return Companion color format.
+     * This strcut represents a wrapper for a cv::Size object.
      */
-    Companion::ColorFormat getColorFormat(ColorFormat colorFormat);
+    public value struct Size
+    {
+        int width;
+        int height;
+    };
 
-    /**
-     * Returns the Companion scaling value for the given winRT scaling value.
-     *
-     * @param scaling   WinRT scaling value.
-     * @return Companion scaling value.
-     */
-    Companion::SCALING getScaling(Scaling scaling);
+    namespace Utils {
 
-    /**
-     * Converts std::string to Platform::String.
-     *
-     * @param str   the std::string to be converted
-     * @return winRT compatible Platform::String
-     */
-    Platform::String^ ss2ps(const std::string& str);
+        /**
+         * Return the Companion color format for the given WinRT color format.
+         *
+         * @param colorFormat   WinRT color format
+         * @return Companion color format
+         */
+        Companion::ColorFormat getColorFormat(ColorFormat colorFormat);
 
-    /**
-     * Converts Platform::String to std::string.
-     *
-     * @param str   the Platform::String to be converted
-     * @return native c++ compatible std::string
-     */
-    std::string ps2ss(Platform::String^ str);
+        /**
+         * Return the Companion scaling value for the given WinRT scaling value.
+         *
+         * @param scaling   WinRT scaling value
+         * @return Companion scaling value
+         */
+        Companion::SCALING getScaling(Scaling scaling);
+
+        /**
+         * Convert std::string to Platform::String.
+         *
+         * @param str   the std::string to be converted
+         * @return WinRT compatible Platform::String
+         */
+        Platform::String^ ss2ps(const std::string& str);
+
+        /**
+         * Convert Platform::String to std::string.
+         *
+         * @param str   the Platform::String to be converted
+         * @return native c++ compatible std::string
+         */
+        std::string ps2ss(Platform::String^ str);
+    }
 }

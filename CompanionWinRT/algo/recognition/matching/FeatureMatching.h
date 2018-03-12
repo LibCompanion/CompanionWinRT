@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include <companion\algo\2D\FeatureMatching.h>
+#include <companion\algo\recognition\matching\FeatureMatching.h>
 
 namespace CompanionWinRT
 {
     /**
-     * Enumeration class for feature matching algorithms.
+     * Feature detector and descritor extractor types.
      */
     public enum class FeatureDetector
     {
@@ -32,9 +32,9 @@ namespace CompanionWinRT
     };
 
     /**
-     * OpenCV DescriptorMatcher types.
+     * OpenCV descriptor matcher types.
      */
-    public enum class DescriptorMatcher
+    public enum class DescriptorMatcherType
     {
         FLANNBASED = cv::DescriptorMatcher::FLANNBASED,
         BRUTEFORCE = cv::DescriptorMatcher::BRUTEFORCE,
@@ -55,35 +55,41 @@ namespace CompanionWinRT
     };
 
     /**
-     * This class provides a WinRT wrapper for the 'FeatureMatching' functionality of the Companion project (CPU only).
+     * This class provides a WinRT wrapper for the 'FeatureMatching' functionality of the Companion framework (CPU only).
      *
      * Note 1:
      * This is a minimum construction -- it has to be extended to provide the same flexability as the Companion native code.
      *
      * Note 2:
-     * Public inheritance is not possible in a Windows Runtime context (with very few exceptions). We can not mirror the
-     * plausible abstract class 'ImageRecognition' for this wrapper.
+     * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+     * We can not mirror the plausible interface / abstract class 'Matching' for this wrapper.
      *
-     * @author Dimitri Kotlovsky
+     * @author Dimitri Kotlovsky, Andreas Sekulski
      */
     public ref class FeatureMatching sealed
     {
         public:
 
             /**
-             * Creates a 'FeatureMatching' wrapper with the provided feature matching algorithm.
+             * Create a 'FeatureMatching' wrapper.
              *
-             * @param detector      desired feature detector
+             * ToDo:
+             * The user should be able to choose between different detectors and extractors. This is a minimum construction.
+             *
+             * @param detector      desired feature detector and descritor extractor
              * @param matcherType   type of the desired descriptor matcher
              */
-            FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType)
+            FeatureMatching(FeatureDetector detector, DescriptorMatcherType matcherType)
                 : FeatureMatching(detector, matcherType, 60, 2000, 10, 40, true, 3.0, 500, EstimationAlgorithm::RANSAC)
             {};
 
             /**
-             * Creates an 'FeatureMatching' wrapper with the provided feature matching algorithm.
+             * Create an 'FeatureMatching' wrapper.
              *
-             * @param detector              desired feature detector
+             * ToDo:
+             * The user should be able to choose between different detectors and extractors. This is a minimum construction.
+             *
+             * @param detector              desired feature detector and descritor extractor
              * @param matcherType           type of the desired descriptor matcher
              * @param thresh                (used by BRISK) AGAST detection threshold score
              * @param nfeatures             (used by ORB) The maximum number of features to retain
@@ -94,11 +100,11 @@ namespace CompanionWinRT
              * @param ransacMaxIters        homography parameter: maximum number of RANSAC iterations (2000 is the maximum)
              * @param findHomographyMethod  method used to compute a homography matrix
              */
-            FeatureMatching(FeatureDetector detector, DescriptorMatcher matcherType, int thresh, int nfeatures, int minSideLength,
+            FeatureMatching(FeatureDetector detector, DescriptorMatcherType matcherType, int thresh, int nfeatures, int minSideLength,
                             int countMatches, bool useIRA, double reprojThreshold, int ransacMaxIters, EstimationAlgorithm findHomographyMethod);
 
             /**
-             * Destructs this instance.
+             * Destruct this instance.
              */
             virtual ~FeatureMatching();
 
@@ -107,32 +113,28 @@ namespace CompanionWinRT
             /**
              * The native 'FeatureMatching' object of this instance.
              */
-            Companion::Algorithm::FeatureMatching* featureMatchingObj;
-            
-            /**
-             * The descriptor matcher of this feature matching configuration.
-             */
-            cv::Ptr<cv::DescriptorMatcher> matcher;
-            
+            Companion::Algorithm::Recognition::Matching::FeatureMatching* featureMatchingObj;
+
             /**
              * The feature detector and descriptor extractor of this feature matching configuration.
              *
              * ToDo:
-             * The User should be able to choose between different detectors and extractors. This is a minimum construction.
+             * The user should be able to choose between different detectors and extractors. This is a minimum construction.
              */
-            cv::Ptr<cv::Feature2D> feature;
+            cv::Ptr<cv::Feature2D> detector;
+
+            /**
+             * The descriptor matcher of this feature matching configuration.
+             */
+            cv::Ptr<cv::DescriptorMatcher> matcher;
 
         internal:
 
             /**
-             * Internal method to provide the native 'ImageRecognition' object (in this case a 'FeatureMatching' object).
+             * Internal method to provide the native 'FeatureMatching' object.
              *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageRecognition' for this wrapper.
-             *
-             * @return Pointer to the native 'ImageRecognition' object
+             * @return pointer to the native 'FeatureMatching' object
              */
-            Companion::Algorithm::Matching* getMatching();
+            Companion::Algorithm::Recognition::Matching::FeatureMatching* getFeatureMatching();
     };
 }

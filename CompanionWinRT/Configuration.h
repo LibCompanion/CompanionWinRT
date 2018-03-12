@@ -1,6 +1,6 @@
 ﻿/*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,11 @@
 #pragma once
 
 #include <collection.h>
-#include "processing\2D\ObjectDetection.h"
+#include "processing\detection\ObjectDetection.h"
+#include "processing\recognition\HashRecognition.h"
+#include "processing\recognition\HybridRecognition.h"
+#include "processing\recognition\MatchRecognition.h"
 #include "input\ImageStream.h"
-#include "model\processing\FeatureMatchingModel.h"
 #include "model\result\Result.h"
 #include "utils\CompanionUtils.h"
 
@@ -46,28 +48,60 @@ namespace CompanionWinRT
     public delegate void ErrorDelegate(Platform::String^ errorMessage);
 
     /**
-     * This class provides WinRT compatible functionality wrapped around the Companion project code.
+     * This class provides WinRT compatible functionality wrapped around the Companion framework code.
      *
-     * @author Dimitri Kotlovsky
+     * @author Dimitri Kotlovsky, Andreas Sekulski
      */
     public ref class Configuration sealed
     {
         public:
 
             /**
-             * Sets the image processing configuration.
+             * Set the image processing algorithm.
              *
-             * @param detection an object detection configuration for this companion configuration
+             * @param processing    an image processing algorithm
              *
              * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageProcessing' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native code.
+             * Native code in interfaces and public inheritance are not possible in a WinRT context (with very few exceptions).
+             * We can not mirror the plausible interface / abstract class 'ImageProcessing' for this wrapper.
              */
-            void setProcessing(ObjectDetection^ detection);
+            void setProcessing(MatchRecognition^ processing);
 
             /**
-             * Sets a function as a result callback for the companion processing.
+             * Set the image processing algorithm.
+             *
+             * @param processing    an image processing algorithm
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a WinRT context (with very few exceptions).
+             * We can not mirror the plausible interface / abstract class 'ImageProcessing' for this wrapper.
+             */
+            void setProcessing(HashRecognition^ processing);
+
+            /**
+             * Set the image processing algorithm.
+             *
+             * @param processing    an image processing algorithm
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a WinRT context (with very few exceptions).
+             * We can not mirror the plausible interface / abstract class 'ImageProcessing' for this wrapper.
+             */
+            void setProcessing(HybridRecognition^ processing);
+
+            /**
+             * Set the image processing algorithm.
+             *
+             * @param processing    an image processing algorithm
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a WinRT context (with very few exceptions).
+             * We can not mirror the plausible interface / abstract class 'ImageProcessing' for this wrapper.
+             */
+            void setProcessing(ObjectDetection^ processing);
+
+            /**
+             * Set a function as a result callback for processing.
              *
              * @param callback      a concrete function that works as a callback for the processing result
              * @param colorFormat   color format of the returned result image
@@ -75,112 +109,74 @@ namespace CompanionWinRT
             void setResultCallback(ResultDelegate^ callback, ColorFormat colorFormat);
 
             /**
-             * Sets a function as an error callback for the companion processing.
+             * Set a function as an error callback for processing.
              *
              * @param callback  a concrete function that works as an error callback
              */
             void setErrorCallback(ErrorDelegate^ callback);
 
             /**
-             * Sets the number of frames to skip.
+             * Set the number of frames to skip.
              *
              * @param skipFrame number of frames which should be skipped after one image processing cycle
              */
             void setSkipFrame(int skipFrame);
 
             /**
-             * Sets the maximum number of images to be loaded into a buffer.
+             * Set the maximum number of images to be loaded into a buffer.
              *
              * @param imageBuffer   maximum number of images to be loaed into a buffer
              */
             void setImageBuffer(int imageBuffer);
 
             /**
-             * Returns the skip frame rate.
+             * Return the skip frame rate.
              *
              * @return number of frames that are skipped after each processed frame
              */
             int getSkipFrame();
 
             /**
-             * Sets the source.
+             * Set the source.
              *
              * @param stream    an image stream as the processing source
              *
              * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'Stream' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native code.
+             * Native code in interfaces and public inheritance are not possible in a WinRT context (with very few exceptions).
+             * We can not mirror the plausible interface / abstract class 'Stream' for this wrapper.
              */
             void setSource(ImageStream^ stream);
 
             /**
-             * Returns the image stream.
+             * Return the image stream.
              *
              * @return the image stream of this configurtion
              *
              * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'Stream' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native code.
+             * Native code in interfaces and public inheritance are not possible in a WinRT context (with very few exceptions).
+             * We can not mirror the plausible interface / abstract class 'Stream' for this wrapper.
              */
             ImageStream^ getSource();
 
             /**
-             * Adds a 'FeatureMatchingModel' object to this companion configuration.
-             *
-             * @param model a feature matching model for this companion configuration
-             *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageRecognitionModel' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native code.
-             */
-            void addModel(FeatureMatchingModel^ model);
-
-            /**
-             * Returns a vector of all feature mathing models.
-             *
-             * @return all feature mathing models
-             *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'ImageRecognitionModel' for this wrapper. This is a minimum construct and has to be
-             * further developed to provide the same flexability as the Companion native code.
-             */
-            IVector<FeatureMatchingModel^>^ getModels();
-
-            /**
-             * Removes the given model form image processing. This function can only be used safetly while companion is not processing.
-             *
-             * @param modelID   ID of the model
-             */
-            void removeModel(int modelID);
-
-            /**
-             * Clears all image processing models.
-             */
-            void clearModels();
-
-            /**
-             * Starts processing of the Companion library.
+             * Start the image processing.
              */
             void run();
 
             /**
-             * Stops processing of the Companion library.
+             * Stop the image processing.
              */
             void stop();
 
         private:
 
             /**
-             * Reference o a concrete result callback function.
+             * Handle to the result callback function.
              */
             ResultDelegate^ resultDelegate;
 
             /**
-             * Rreference o a concrete error callback function.
+             * Handle to the error callback function.
              */
             ErrorDelegate^ errorDelegate;
            
@@ -190,18 +186,28 @@ namespace CompanionWinRT
             Companion::Configuration configurationObj;
 
             /**
+             * A handle to the 'MatchRecognition' wrapper object.
+             */
+            MatchRecognition^ matchRecognition;
+
+            /**
+             * A handle to the 'HashRecognition' wrapper object.
+             */
+            HashRecognition^ hashRecognition;
+
+            /**
+             * A handle to the 'HybridRecognition' wrapper object.
+             */
+            HybridRecognition^ hybridRecognition;
+
+            /**
              * A handle to the 'ObjectDetection' wrapper object.
              */
-            ObjectDetection^ detection;
+            ObjectDetection^ objectDetection;
 
             /**
              * A handle to the 'ImageStream' wrapper object.
              */
             ImageStream^ stream;
-
-            /**
-             * A collection of all feature matching models.
-             */
-            Vector<FeatureMatchingModel^>^ models = ref new Vector<FeatureMatchingModel^>();
     };
 }

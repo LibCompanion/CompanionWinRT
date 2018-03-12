@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */
 
 #include "ImageStream.h"
-#include "companionWinRT\utils\CompanionUtils.h"
+#include "CompanionWinRT\utils\CompanionUtils.h"
 
 using namespace CompanionWinRT;
 
@@ -34,7 +34,7 @@ ImageStream::~ImageStream()
 
 bool ImageStream::addImage(Platform::String^ imgPath)
 {
-    return this->imageStreamObj->addImage(ps2ss(imgPath));
+    return this->imageStreamObj->addImage(Utils::ps2ss(imgPath));
 }
 
 bool ImageStream::addImage(int width, int height, int type, const Platform::Array<uint8>^ data)
@@ -42,7 +42,7 @@ bool ImageStream::addImage(int width, int height, int type, const Platform::Arra
     return this->imageStreamObj->addImage(width, height, type, data->Data);
 }
 
-Companion::Input::Stream* ImageStream::getStream()
+Companion::Input::Image* ImageStream::getImageStream()
 {
     return this->imageStreamObj;
 }

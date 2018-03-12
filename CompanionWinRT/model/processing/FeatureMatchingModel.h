@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,54 +24,46 @@
 namespace CompanionWinRT
 {
     /**
-     * This class provides a WinRT wrapper for the 'FeatureMatchingModel' functionality of the Companion project.
+     * This class provides a WinRT wrapper for the 'FeatureMatchingModel' functionality of the Companion framework.
      *
-     * Note:
-     * Public inheritance is not possible in a Windows Runtime context (with very few exceptions). We can not mirror the
-     * plausible abstract class 'ImageRecognitionModel' for this wrapper.
-     *
-     * @author Dimitri Kotlovsky
+     * @author Dimitri Kotlovsky, Andreas Sekulski
      */
     public ref class FeatureMatchingModel sealed
     {
-    public:
+        public:
 
-        /**
-         * Creates an 'FeatureMatchingModel' wrapper with the provided image path.
-         *
-         * @param imagePath path of the image that is going to be a feature matching model
-         * @param id        the ID of this model
-         */
-        FeatureMatchingModel(Platform::String^ imagePath, int id);
+            /**
+             * Create a 'FeatureMatchingModel' wrapper with the provided image path.
+             *
+             * @param imagePath path of the image that is going to be a feature matching model
+             * @param id        the ID of this model
+             */
+            FeatureMatchingModel(Platform::String^ imagePath, int id);
 
-        /**
-         * Destructs this instance.
-         */
-        virtual ~FeatureMatchingModel();
+            /**
+             * Destruct this instance.
+             */
+            virtual ~FeatureMatchingModel();
 
-    private:
+        private:
 
-        /**
-         * The native 'FeatureMatchingModel' object of this instance.
-         */
-        Companion::Model::Processing::FeatureMatchingModel* featureMatchingModelObj;
+            /**
+             * The native 'FeatureMatchingModel' object of this instance.
+             */
+            Companion::Model::Processing::FeatureMatchingModel* featureMatchingModelObj;
 
-        /**
-         * The native 'cv:Mat' object of this model.
-         */
-        cv::Mat imageModel;
+            /**
+             * The native 'cv:Mat' object of this model.
+             */
+            cv::Mat imageModel;
 
-    internal:
+        internal:
 
-        /**
-         * Internal method to provide the native 'ImageRecognitionModel' object (in this case an 'FeatureMatchingModel' object).
-         *
-         * Note:
-         * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-         * plausible abstract class 'ImageRecognitionModel' for this wrapper.
-         *
-         * @return Pointer to the native 'ImageRecognitionModel' object
-         */
-        Companion::Model::Processing::ImageRecognitionModel* getModel();
+            /**
+             * Internal method to provide the native 'FeatureMatchingModel' object.
+             *
+             * @return pointer to the native 'FeatureMatchingModel' object
+             */
+            Companion::Model::Processing::FeatureMatchingModel* getFeatureMatchingModel();
     };
 }

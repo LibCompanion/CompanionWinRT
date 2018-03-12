@@ -2,6 +2,8 @@
 
 Windows Runtime Component wrapper for [Companion](https://github.com/LibCompanion/libCompanion/). Since the WinRT Component uses C++/CX it can be used in *Universal Windows Platform* (UWP) apps that are written in C#, Visual Basic, JavaScript, and other languages that support the Windows Runtime.
 
+![CompanionUWPSample](https://libcompanion.github.io/CompanionDoc/images/example/uwpSample.png "CompanionUWPSample")
+
 ## Dependencies
 
 * OpenCV 3 for WinRT/UWP: [opencvWinRT](https://github.com/LibCompanion/opencvWinRT/)
@@ -9,7 +11,7 @@ Windows Runtime Component wrapper for [Companion](https://github.com/LibCompanio
 ## Building CompanionWinRT
 
 1. To begin with, you will need to build OpenCV 3 for WinRT/UWP: [opencvWinRT](https://github.com/LibCompanion/opencvWinRT/)
-2. Simply use cmake or cmake-gui to build CompanionWinRT.
+2. Simply use CMake or CMake GUI to build CompanionWinRT.
 
 ## Getting started
 
@@ -21,8 +23,7 @@ Feel free to use the provided sample app as a starting point. Unfortunately CMak
 
 3. Add the `CompanionWinRT` project as a reference to the `CompanionUWPSample` project: right click on the project name and choose `Add` > `Reference...`.
 4. Right click on `CompanionUWPSample` and choose `Set as StartUp Project`.
-5. Add your own image samples and an image source folder to the project assets (video is not supported at the moment).
-6. Add your OpenCV-DLLs to the project by right clicking on `CompanionUWPSample` and choosing `Add` > `Existing Item...`.
+5. Add your OpenCV-DLLs to the project by right clicking on `CompanionUWPSample` and choosing `Add` > `Existing Item...`.
 
 ## License
 

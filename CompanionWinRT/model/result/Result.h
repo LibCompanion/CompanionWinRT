@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,62 +18,65 @@
 
 #pragma once
 
-#include <companion\model\result\Result.h>
-
-#include "companionWinRT\draw\Frame.h"
+#include "CompanionWinRT\draw\Frame.h"
 
 namespace CompanionWinRT
 {
     /**
-     * This class represents a model to store object detection results.
+     * This class represents a model to store object detection or recognition results.
      *
-     * @author Dimitri Kotlovsky
+     * @author Dimitri Kotlovsky, Andreas Sekulski
      */
     public ref class Result sealed
     {
-    public:
+        public:
 
-        /**
-         * Creates a 'Result' object.
-         */
-        Result(int id, int scoring, Frame^ frame);
+            /**
+             * Create a 'Result' object.
+             */
+            Result(Platform::String^ description, int scoring, Frame^ frame);
 
-        /**
-         * Returns the ID of this model.
-         *
-         * @return ID of this model
-         */
-        int getId();
+            /**
+             * Return the matching score of the detected or recognized object.
+             *
+             * @return matching score
+             */
+            int getScore();
 
-        /**
-         * Returns the matching score of this model.
-         *
-         * @return matching score
-         */
-        int getScore();
+            /**
+             * Return the pixel frame of the detected or recognized object.
+             *
+             * @return pixel frame
+             */
+            Frame^ getFrame();
 
-        /**
-         * Returns the pixel frame of this model.
-         *
-         * @return pixel frame
-         */
-        Frame^ getFrame();
+            /**
+             * Return the object description. This may be the ID or the object type.
+             *
+             * @return object description
+             */
+            Platform::String^ getDescription();
 
-    private:
+        private:
 
-        /**
-         * The ID of this model.
-         */
-        int id;
+            /**
+             * The ID of the detected or recognized object.
+             */
+            int id;
 
-        /**
-         * Matching score (0% - 100%).
-         */
-        int score;
+            /**
+             * Detection or recognition score (0% - 100%).
+             */
+            int score;
 
-        /**
-         * A pixel frame representing the detected object.
-         */
-        Frame^ frame;
+            /**
+             * A pixel frame representing the detected or recognized object.
+             */
+            Frame^ frame;
+
+            /**
+             * The description of the detected or recognized object.
+             */
+            Platform::String^ description;
     };
 }

@@ -1,6 +1,6 @@
 #
-# CompanionWinRT is a Windows Runtime wrapper for libCompanion.
-# Copyright (C) 2017 Dimitri Kotlovsky
+# CompanionWinRT is a Windows Runtime wrapper for Companion.
+# Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,16 @@
 # Add source files
 SET(SOURCE
     Configuration.cpp Configuration.h
-    algo/2D/FeatureMatching.cpp algo/2D/FeatureMatching.h
+    algo/detection/ShapeDetection.cpp algo/detection/ShapeDetection.h
+    algo/recognition/hashing/LSH.cpp algo/recognition/hashing/LSH.h
+    algo/recognition/matching/FeatureMatching.cpp algo/recognition/matching/FeatureMatching.h
     draw/Frame.cpp draw/Frame.h
     model/processing/FeatureMatchingModel.cpp model/processing/FeatureMatchingModel.h
     model/result/Result.cpp model/result/Result.h
-    processing/2D/ObjectDetection.cpp processing/2D/ObjectDetection.h
+    processing/detection/ObjectDetection.cpp processing/detection/ObjectDetection.h
+    processing/recognition/MatchRecognition.cpp processing/recognition/MatchRecognition.h
+    processing/recognition/HashRecognition.cpp processing/recognition/HashRecognition.h
+    processing/recognition/HybridRecognition.cpp processing/recognition/HybridRecognition.h
     input/ImageStream.cpp input/ImageStream.h
     utils/CompanionError.h
     utils/CompanionUtils.cpp utils/CompanionUtils.h

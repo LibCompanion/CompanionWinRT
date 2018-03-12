@@ -1,6 +1,6 @@
 ﻿/*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,48 +23,69 @@
 
 using namespace CompanionWinRT;
 
-void Configuration::setProcessing(ObjectDetection^ detection)
+void Configuration::setProcessing(MatchRecognition^ processing)
 {
-    this->detection = detection;
-    this->configurationObj.setProcessing(this->detection->getProcessing(&this->configurationObj));
+    this->matchRecognition = processing;
+    this->configurationObj.setProcessing(this->matchRecognition->getMatchRecognition());
+}
+
+void Configuration::setProcessing(HashRecognition^ processing)
+{
+    this->hashRecognition = processing;
+    this->configurationObj.setProcessing(this->hashRecognition->getHashRecognition());
+}
+
+void Configuration::setProcessing(HybridRecognition^ processing)
+{
+    this->hybridRecognition = processing;
+    this->configurationObj.setProcessing(this->hybridRecognition->getHybridRecognition());
+}
+
+void Configuration::setProcessing(ObjectDetection^ processing)
+{
+    this->objectDetection = processing;
+    this->configurationObj.setProcessing(this->objectDetection->getObjectDetection());
 }
 
 void Configuration::setResultCallback(ResultDelegate^ callback, ColorFormat colorFormat)
 {
-    Companion::ColorFormat colorForm = getColorFormat(colorFormat);
-    this->configurationObj.setResultHandler([callback](std::vector<Companion::Model::Result*> results, cv::Mat image)
+    Companion::ColorFormat colorForm = Utils::getColorFormat(colorFormat);
+    this->configurationObj.setResultHandler([callback](std::vector<Companion::Model::Result::Result*> results, cv::Mat image)
     {
         Vector<Result^>^ resultsCX = ref new Vector<Result^>();
         Result^ resultCX;
         Frame^ frameCX;
 
-        Companion::Model::Result* result;
+        Companion::Model::Result::Result* result;
         Companion::Draw::Frame* frame;
 
         // Process all positive results
         for (size_t i = 0; i < results.size(); i++)
         {
             result = results.at(i);
-            frame = dynamic_cast<Companion::Draw::Frame*>(result->getModel());
+            frame = dynamic_cast<Companion::Draw::Frame*>(result->getDrawable());
+            if (frame != nullptr)
+            {
+                // Draw a frame around the detected object
+                frame->draw(image);
+
+                // Draw the id of the detected object
+                cv::putText(image,
+                    result->getDescription(),
+                    frame->getTopRight(),
+                    cv::FONT_HERSHEY_DUPLEX,
+                    2,
+                    frame->getColor(),
+                    frame->getThickness());
+
+                // Capsule the result data into ABI friendly C++/CX objects
+                frameCX = ref new Frame(Point{ frame->getTopLeft().x,     frame->getTopLeft().y },
+                                        Point{ frame->getTopRight().x,    frame->getTopRight().y },
+                                        Point{ frame->getBottomRight().x, frame->getBottomRight().y },
+                                        Point{ frame->getBottomLeft().x,  frame->getBottomLeft().y });
+                resultCX = ref new Result(Utils::ss2ps(result->getDescription()), result->getScoring(), frameCX);
+            }
             
-            // Draw a frame around the detected object
-            frame->draw(image);
-
-            // Draw the id of the detected object
-            cv::putText(image,
-                        std::to_string(result->getId()),
-                        frame->getTopRight(),
-                        cv::FONT_HERSHEY_DUPLEX,
-                        2,
-                        frame->getColor(),
-                        frame->getThickness());
-
-            // Capsule the result data into ABI friendly C++/CX objects
-            frameCX = ref new Frame(Point{ frame->getTopLeft().x,     frame->getTopLeft().y     },
-                                    Point{ frame->getTopRight().x,    frame->getTopRight().y    },
-                                    Point{ frame->getBottomRight().x, frame->getBottomRight().y },
-                                    Point{ frame->getBottomLeft().x,  frame->getBottomLeft().y  });
-            resultCX = ref new Result(result->getId(), result->getScoring(), frameCX);
             resultsCX->Append(resultCX);
         }
 
@@ -84,7 +105,7 @@ void Configuration::setErrorCallback(ErrorDelegate^ callback)
 {
     this->configurationObj.setErrorHandler([callback](Companion::Error::Code code)
     {
-        callback->Invoke(ss2ps(Companion::Error::getError(code)));
+        callback->Invoke(Utils::ss2ps(Companion::Error::getError(code)));
     });
 }
 
@@ -106,45 +127,12 @@ int Configuration::getSkipFrame()
 void Configuration::setSource(ImageStream^ stream)
 {
     this->stream = stream;
-    this->configurationObj.setSource(this->stream->getStream());
+    this->configurationObj.setSource(this->stream->getImageStream());
 }
 
 ImageStream^ Configuration::getSource()
 {
     return this->stream;
-}
-
-void Configuration::addModel(FeatureMatchingModel^ model)
-{
-    this->models->Append(model);
-    if (!this->configurationObj.addModel(model->getModel()))
-    {
-        int hresult = static_cast<int>(ErrorCode::model_not_added);
-        throw ref new Platform::Exception(hresult);
-    }
-}
-
-IVector<FeatureMatchingModel^>^ Configuration::getModels()
-{
-    return this->models;
-}
-
-void Configuration::removeModel(int modelID)
-{
-    for (int i = 0; i < this->models->Size; i++)
-    {
-        if (this->models->GetAt(i)->getModel()->getID() == modelID)
-        {
-            this->configurationObj.removeModel(modelID);
-            this->models->RemoveAt(i);
-        }
-    }
-}
-
-void Configuration::clearModels()
-{
-    this->configurationObj.clearModels();
-    this->models->Clear();
 }
 
 void Configuration::run()

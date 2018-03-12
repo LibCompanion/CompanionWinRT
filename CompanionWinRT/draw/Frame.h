@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 namespace CompanionWinRT
 {
     /**
-     * Represents a point in an image.
+     * This strcut represents a point in an image.
      */
     public value struct Point
     {
@@ -34,14 +34,14 @@ namespace CompanionWinRT
     /**
      * This class represents a frame around a detected object in an image.
      *
-     * @author Dimitri Kotlovsky
+     * @author Dimitri Kotlovsky, Andreas Sekulski
      */
     public ref class Frame sealed
     {
     public:
 
         /**
-         * Creates a 'Frame' object with the provided corners.
+         * Create a 'Frame' object with the provided corners.
          *
          * @param upperLeft     upper left corner
          * @param upperRight    upper right corner
@@ -51,28 +51,28 @@ namespace CompanionWinRT
         Frame(Point upperLeft, Point upperRight, Point lowerRight, Point lowerLeft);
         
         /**
-         * Returns the upper left corner of this frame.
+         * Return the upper left corner of this frame.
          *
          * @return upper left corner
          */
         Point getUpperLeftCorner();
 
         /**
-         * Returns the upper right corner of this frame.
+         * Return the upper right corner of this frame.
          *
          * @return upper right corner
          */
         Point getUpperRightCorner();
 
         /**
-         * Returns the lower right corner of this frame.
+         * Return the lower right corner of this frame.
          *
          * @return lower right corner
          */
         Point getLowerRightCorner();
 
         /**
-         * Returns the lower left corner of this frame.
+         * Return the lower left corner of this frame.
          *
          * @return lower left corner
          */

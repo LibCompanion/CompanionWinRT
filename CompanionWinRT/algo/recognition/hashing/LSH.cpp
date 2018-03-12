@@ -16,31 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Frame.h"
+#include "LSH.h"
 
 using namespace CompanionWinRT;
 
-Frame::Frame(Point upperLeft, Point upperRight, Point lowerRight, Point lowerLeft)
-    : upperLeft(upperLeft), upperRight(upperRight), lowerRight(lowerRight), lowerLeft(lowerLeft)
+LSH::LSH()
 {
+    this->lshObj = new Companion::Algorithm::Recognition::Hashing::LSH();
 }
 
-Point Frame::getUpperLeftCorner()
+LSH::~LSH()
 {
-    return this->upperLeft;
+    delete this->lshObj;
+    this->lshObj = nullptr;
 }
 
-Point Frame::getUpperRightCorner()
+Companion::Algorithm::Recognition::Hashing::LSH* LSH::getLSH()
 {
-    return this->upperRight;
-}
-
-Point Frame::getLowerRightCorner()
-{
-    return this->lowerRight;
-}
-
-Point Frame::getLowerLeftCorner()
-{
-    return this->lowerLeft;
+    return this->lshObj;
 }

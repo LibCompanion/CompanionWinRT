@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,8 @@
 
 using namespace CompanionWinRT;
 
-Result::Result(int id, int score, Frame^ frame) : id(id), score(score), frame(frame)
+Result::Result(Platform::String^ description, int score, Frame^ frame) : description(description), score(score), frame(frame)
 {
-}
-
-int Result::getId()
-{
-    return this->id;
 }
 
 int Result::getScore()
@@ -37,4 +32,9 @@ int Result::getScore()
 Frame^ Result::getFrame()
 {
     return this->frame;
+}
+
+Platform::String^ Result::getDescription()
+{
+    return this->description;
 }

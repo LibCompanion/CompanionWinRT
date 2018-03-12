@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  */
 
 #include "FeatureMatchingModel.h"
-#include "companionWinRT\utils\CompanionUtils.h"
-#include "companionWinRT\utils\CompanionError.h"
+#include "CompanionWinRT\utils\CompanionUtils.h"
+#include "CompanionWinRT\utils\CompanionError.h"
 
 using namespace CompanionWinRT;
 
@@ -27,13 +27,9 @@ FeatureMatchingModel::FeatureMatchingModel(Platform::String^ imagePath, int id)
     if (imagePath != nullptr)
     {
         this->featureMatchingModelObj = new Companion::Model::Processing::FeatureMatchingModel();
-        this->imageModel = cv::imread(ps2ss(imagePath), cv::IMREAD_GRAYSCALE); // ToDO: should the user be able to change IMREAD value?
+        this->imageModel = cv::imread(Utils::ps2ss(imagePath), cv::IMREAD_GRAYSCALE);
         this->featureMatchingModelObj->setImage(this->imageModel);
         this->featureMatchingModelObj->setID(id);
-        
-        /* ToDo for wrapper: construct 'FeatureMatchingModel' with a reference to 'CPUFeatureMatching' */
-        // Only works on CPU -- ToDo Exception Handling if wrong type?
-        //object->calculateKeyPointsAndDescriptors(feature, feature);
     }
     else
     {
@@ -48,7 +44,7 @@ FeatureMatchingModel::~FeatureMatchingModel()
     this->featureMatchingModelObj = nullptr;
 }
 
-Companion::Model::Processing::ImageRecognitionModel* FeatureMatchingModel::getModel()
+Companion::Model::Processing::FeatureMatchingModel* FeatureMatchingModel::getFeatureMatchingModel()
 {
     return this->featureMatchingModelObj;
 }

@@ -1,6 +1,6 @@
 /*
- * CompanionWinRT is a Windows Runtime wrapper for libCompanion.
- * Copyright (C) 2017 Dimitri Kotlovsky
+ * CompanionWinRT is a Windows Runtime wrapper for Companion.
+ * Copyright (C) 2017-2018 Dimitri Kotlovsky, Andreas Sekulski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,27 +23,27 @@
 namespace CompanionWinRT
 {
     /**
-     * This class provides a WinRT wrapper for the 'ImageStream' functionality of the Companion project.
+     * This class provides a WinRT wrapper for the 'ImageStream' functionality of the Companion framework.
      *
      * Note:
-     * Public inheritance is not possible in a Windows Runtime context (with very few exceptions). We can not mirror the
-     * plausible abstract class 'Stream' for this wrapper.
+     * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+     * We can not mirror the plausible interface / abstract class 'Stream' for this wrapper.
      *
-     * @author Dimitri Kotlovsky
+     * @author Dimitri Kotlovsky, Andreas Sekulski
      */
     public ref class ImageStream sealed
     {
         public:
 
             /**
-             * Creates an 'ImageStream' wrapper with the provided maximum amount of images that can be loaded at the same time.
+             * Create an 'ImageStream' wrapper with the provided maximum amount of images that can be loaded at the same time.
              *
              * @param maxImages     maximum amount of images that can be loaded at the same time
              */
             ImageStream(int maxImages);
             
             /**
-             * Destructs this instance.
+             * Destruct this instance.
              */
             virtual ~ImageStream();
 
@@ -76,14 +76,10 @@ namespace CompanionWinRT
         internal:
 
             /**
-             * Internal method to provide the native 'Stream' object (in this case an 'ImageStream' object).
+             * Internal method to provide the native 'ImageStream' object.
              *
-             * Note:
-             * Public inheritance is not possible in a WinRT context (with very few exceptions). We can not mirror the
-             * plausible abstract class 'Stream' for this wrapper.
-             *
-             * @return Pointer to the native 'Stream' object
+             * @return Pointer to the native 'ImageStream' object
              */
-            Companion::Input::Stream* getStream();
+            Companion::Input::Image* getImageStream();
     };
 }

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CompanionUWPSample")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("CompanionUWPSample is a UWP example app for CompanionWinRT.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CompanionUWPSample")]
-[assembly: AssemblyCopyright("Copyright ©  2017 Dimitri Kotlovsky")]
+[assembly: AssemblyProduct("Companion")]
+[assembly: AssemblyCopyright("Copyright © 2017-2018 Dimitri Kotlovsky, Andreas Sekulski")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

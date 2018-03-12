@@ -50,7 +50,7 @@ find_package(OpenCV REQUIRED ${OpenCVComponents})
 
 
 # Configure CompanionWinRT
-add_subdirectory(libCompanion)
+add_subdirectory(Companion)
 add_subdirectory(CompanionWinRT)
 target_include_directories(CompanionWinRT PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>  
