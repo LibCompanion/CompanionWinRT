@@ -158,7 +158,7 @@ namespace CompanionUWPSample {
                     await this.CreateConfiguration((ImageProcessingMethod) Int32.Parse(tag.ToString()));
 
                     // Constantly import images as the source for processing
-                    IAsyncAction imageThread = Task.Run(async () => {
+                    Task task = Task.Run(async () => {
                         
                         // Save the source image paths to a list for the 'ImageStream' object
                         IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
@@ -169,7 +169,7 @@ namespace CompanionUWPSample {
 
                             this.configuration?.getSource()?.addImage(fileList[i].Path);
                         }
-                    }).AsAsyncAction();
+                    });
 
                     // Activate the cancle button
                     this.cancelButton.IsEnabled = true;
@@ -178,7 +178,7 @@ namespace CompanionUWPSample {
                     await this.RunCompanion();
 
                     // Wait until the image thread has stopped or finished
-                    await imageThread;
+                    await task;
 
                     // Reset the application
                     this.startButton.IsEnabled = true;
@@ -227,13 +227,14 @@ namespace CompanionUWPSample {
                 // Create algorithms
                 CW.FeatureMatching feature = new CW.FeatureMatching(CW.FeatureDetector.BRISK, CW.DescriptorMatcherType.BRUTEFORCE_HAMMING);
                 CW.LSH lsh = new CW.LSH();
-                CW.ShapeDetection shapeDetection = new CW.ShapeDetection();
+                CW.ShapeDetection polygonDetection = new CW.ShapeDetection();
+                CW.ShapeDetection quadDetection = new CW.ShapeDetection(4, 4, "Quad");
 
                 // Configure image processing
                 CW.MatchRecognition matchRecognition = new CW.MatchRecognition(feature, CW.Scaling.SCALE_640x360);
-                CW.HashRecognition hashRecognition = new CW.HashRecognition(shapeDetection, lsh);
+                CW.HashRecognition hashRecognition = new CW.HashRecognition(polygonDetection, lsh);
                 CW.HybridRecognition hybridRecognition = new CW.HybridRecognition(hashRecognition, feature, 50);
-                CW.ObjectDetection objectDetection = new CW.ObjectDetection(shapeDetection);
+                CW.ObjectDetection objectDetection = new CW.ObjectDetection(quadDetection);
 
                 // Set callback methods (result image should have an alpha channel (required for WritableBitmap))
                 this.configuration.setResultCallback(this.ResultCallback, CW.ColorFormat.BGRA);

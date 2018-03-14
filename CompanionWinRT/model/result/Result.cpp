@@ -20,8 +20,17 @@
 
 using namespace CompanionWinRT;
 
-Result::Result(Platform::String^ description, int score, Frame^ frame) : description(description), score(score), frame(frame)
+Result::Result(ResultType resultType, Frame^ frame, int id, Platform::String^ objectType, int score) : resultType(resultType), frame(frame), id(id), objectType(objectType), score(score)
 {
+}
+
+Result::~Result()
+{
+}
+
+ResultType Result::getType()
+{
+    return this->resultType;
 }
 
 int Result::getScore()
@@ -36,5 +45,10 @@ Frame^ Result::getFrame()
 
 Platform::String^ Result::getDescription()
 {
-    return this->description;
+    return (this->resultType == ResultType::RECOGNITION) ? this->id.ToString() : this->objectType;
+}
+
+int Result::getID()
+{
+    return this->id;
 }

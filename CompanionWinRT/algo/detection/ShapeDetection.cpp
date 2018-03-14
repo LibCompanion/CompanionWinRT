@@ -20,23 +20,13 @@
 
 using namespace CompanionWinRT;
 
-ShapeDetection::ShapeDetection(StructuringElement morphKernel, StructuringElement erodeKernel, StructuringElement dilateKernel, Shape shape, double cannyThreshold, int dilateIteration)
+ShapeDetection::ShapeDetection(int minCorners, int maxCorners, Platform::String^ shapeDescription, double cannyThreshold, int dilateIteration, StructuringElement morphKernel,
+    StructuringElement erodeKernel, StructuringElement dilateKernel)
 {
-    Companion::Algorithm::Detection::Shape shapeType;
-    switch (shape)
-    {
-        case Shape::QUAD:
-            shapeType = Companion::Algorithm::Detection::Shape::QUAD;
-            break;
-    }
-
-    this->shapeDetectionObj = new Companion::Algorithm::Detection::ShapeDetection(
+    this->shapeDetectionObj = new Companion::Algorithm::Detection::ShapeDetection(minCorners, maxCorners, Utils::ps2ss(shapeDescription), cannyThreshold, dilateIteration,
         cv::getStructuringElement((int)morphKernel.shape, cv::Size(morphKernel.size.width, morphKernel.size.height)),
         cv::getStructuringElement((int)erodeKernel.shape, cv::Size(erodeKernel.size.width, erodeKernel.size.height)),
-        cv::getStructuringElement((int)dilateKernel.shape, cv::Size(dilateKernel.size.width, dilateKernel.size.height)),
-        shapeType,
-        cannyThreshold,
-        dilateIteration
+        cv::getStructuringElement((int)dilateKernel.shape, cv::Size(dilateKernel.size.width, dilateKernel.size.height))
     );
 }
 
@@ -44,11 +34,6 @@ ShapeDetection::~ShapeDetection()
 {
     delete this->shapeDetectionObj;
     this->shapeDetectionObj = nullptr;
-}
-
-Shape ShapeDetection::getShape()
-{
-    return this->shape;
 }
 
 Companion::Algorithm::Detection::ShapeDetection* ShapeDetection::getShapeDetection()

@@ -25,14 +25,6 @@
 namespace CompanionWinRT
 {
     /**
-     * Shapes.
-     */
-    public enum class Shape
-    {
-        QUAD
-    };
-
-    /**
      * OpenCV morph shapes.
      */
     public enum class MorphShape
@@ -77,44 +69,47 @@ namespace CompanionWinRT
             /**
              * Create a 'ShapeDetection' wrapper.
              */
-            ShapeDetection() : ShapeDetection(
+            ShapeDetection() : ShapeDetection(4, 20, "Polygon", 50.0, 3,
                 StructuringElement{ MorphShape::RECT, Size{ 30, 30 } },
                 StructuringElement{ MorphShape::RECT, Size{ 10, 10 } },
-                StructuringElement{ MorphShape::RECT, Size{ 40, 40 } },
-                Shape::QUAD,
-                50.0, 3)
+                StructuringElement{ MorphShape::RECT, Size{ 40, 40 } })
             {};
 
             /**
              * Create a 'ShapeDetection' wrapper.
              *
+             * @param minCorners        minimum number of corners
+             * @param maxCorners        maximum number of corners
+             * @param shapeDescription  shape description
+             */
+            ShapeDetection(int minCorners, int maxCorners, Platform::String^ shapeDescription) : ShapeDetection(
+                minCorners, maxCorners, shapeDescription, 50.0, 3,
+                StructuringElement{ MorphShape::RECT, Size{ 30, 30 } },
+                StructuringElement{ MorphShape::RECT, Size{ 10, 10 } },
+                StructuringElement{ MorphShape::RECT, Size{ 40, 40 } })
+            {};
+
+            /**
+             * Create a 'ShapeDetection' wrapper.
+             *
+             * @param minCorners        minimum number of corners
+             * @param maxCorners        maximum number of corners
+             * @param shapeDescription  shape description
+             * @param cannyThreshold    canny threshold
+             * @param dilateIteration   number of dilate iterations
              * @param morphKernel       morphology kernel size
              * @param erodeKernel       erode kernel size
              * @param dilateKernel      dilate kernel size
-             * @param shape             shape type
-             * @param cannyThreshold    canny threshold
-             * @param dilateIteration   number of dilate iterations
              */
-            ShapeDetection(StructuringElement morphKernel, StructuringElement erodeKernel, StructuringElement dilateKernel, Shape shape, double cannyThreshold, int dilateIteration);
+            ShapeDetection(int minCorners, int maxCorners, Platform::String^ shapeDescription, double cannyThreshold, int dilateIteration, StructuringElement morphKernel,
+                StructuringElement erodeKernel, StructuringElement dilateKernel);
 
             /**
              * Destruct this instance.
              */
             virtual ~ShapeDetection();
 
-            /**
-             * Return the detection shape.
-             *
-             * @return detection shape
-             */
-            Shape getShape();
-
         private:
-
-            /**
-             * Shape type.
-             */
-            Shape shape;
 
             /**
              * The native 'ShapeDetection' object of this instance.

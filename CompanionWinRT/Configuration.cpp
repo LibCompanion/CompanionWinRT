@@ -78,12 +78,22 @@ void Configuration::setResultCallback(ResultDelegate^ callback, ColorFormat colo
                     frame->getColor(),
                     frame->getThickness());
 
-                // Capsule the result data into ABI friendly C++/CX objects
+                // Capsule the frame into an ABI friendly C++/CX object
                 frameCX = ref new Frame(Point{ frame->getTopLeft().x,     frame->getTopLeft().y },
                                         Point{ frame->getTopRight().x,    frame->getTopRight().y },
                                         Point{ frame->getBottomRight().x, frame->getBottomRight().y },
                                         Point{ frame->getBottomLeft().x,  frame->getBottomLeft().y });
-                resultCX = ref new Result(Utils::ss2ps(result->getDescription()), result->getScoring(), frameCX);
+
+                // Capusle the result into an ABI friendly C++/CX object
+                if (result->getType() == Companion::Model::Result::ResultType::RECOGNITION) {
+                    Companion::Model::Result::RecognitionResult* recResult = (Companion::Model::Result::RecognitionResult*) result;
+                    resultCX = ref new Result(ResultType::RECOGNITION, frameCX, recResult->getId(), recResult->getScoring());
+                }
+                else if (result->getType() == Companion::Model::Result::ResultType::DETECTION)
+                {
+                    Companion::Model::Result::DetectionResult* detResult = (Companion::Model::Result::DetectionResult*) result;
+                    resultCX = ref new Result(ResultType::DETECTION, frameCX, Utils::ss2ps(detResult->getObjectType()), detResult->getScoring());
+                }
             }
             
             resultsCX->Append(resultCX);

@@ -23,7 +23,19 @@
 namespace CompanionWinRT
 {
     /**
+     * Result types.
+     */
+    public enum class ResultType {
+        RECOGNITION,
+        DETECTION
+    };
+
+    /**
      * This class represents a model to store object detection or recognition results.
+     *
+     * Note:
+     * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+     * We can not mirror the plausible abstract class 'Result' for this wrapper.
      *
      * @author Dimitri Kotlovsky, Andreas Sekulski
      */
@@ -33,8 +45,60 @@ namespace CompanionWinRT
 
             /**
              * Create a 'Result' object.
+             *
+             * @param resultType    result type
+             * @param id            id of the recognized object (recognition result) or -1 if this is a detection result
+             * @param score         matching score
+             * @param frame         pixel frame that represents the detected or recognized object
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+             * We can not mirror the plausible abstract class 'Result' for this wrapper.
              */
-            Result(Platform::String^ description, int scoring, Frame^ frame);
+            Result(ResultType resultType, Frame^ frame, int id, int score) : Result(resultType, frame, id, "", score)
+            {};
+
+            /**
+             * Create a 'Result' object.
+             *
+             * @param resultType    result type
+             * @param objectType    object type (detection result) of empty string if this is a recognition result
+             * @param score         matching score
+             * @param frame         pixel frame that represents the detected or recognized object
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+             * We can not mirror the plausible abstract class 'Result' for this wrapper.
+             */
+            Result(ResultType resultType, Frame^ frame, Platform::String^ objectType, int score) : Result(resultType, frame, -1, objectType, score)
+            {};
+
+            /**
+             * Create a 'Result' object.
+             *
+             * @param resultType    result type
+             * @param id            id of the recognized object (recognition result) or -1 if this is a detection result
+             * @param objectType    object type (detection result) of empty string if this is a recognition result
+             * @param score         matching score
+             * @param frame         pixel frame that represents the detected or recognized object
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+             * We can not mirror the plausible abstract class 'Result' for this wrapper.
+             */
+            Result(ResultType resultType, Frame^ frame, int id, Platform::String^ objectType, int score);
+
+            /**
+             * Destruct this instance.
+             */
+            virtual ~Result();
+
+            /**
+             * Return the result type.
+             *
+             * @return result type
+             */
+            ResultType getType();
 
             /**
              * Return the matching score of the detected or recognized object.
@@ -57,12 +121,23 @@ namespace CompanionWinRT
              */
             Platform::String^ getDescription();
 
+            /**
+             * Return the ID of the recognized object if this is a recognition result.
+             *
+             * @return ID of the recognized object
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+             * We can not mirror the plausible abstract class 'Result' for this wrapper.
+             */
+            int getID();
+
         private:
 
             /**
-             * The ID of the detected or recognized object.
+             * Result type.
              */
-            int id;
+            ResultType resultType;
 
             /**
              * Detection or recognition score (0% - 100%).
@@ -75,8 +150,17 @@ namespace CompanionWinRT
             Frame^ frame;
 
             /**
-             * The description of the detected or recognized object.
+             * Object type.
              */
-            Platform::String^ description;
+            Platform::String^ objectType;
+
+            /**
+             * The ID of the recognized object if this is a recognition result.
+             *
+             * Note:
+             * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
+             * We can not mirror the plausible abstract class 'Result' for this wrapper.
+             */
+            int id;
     };
 }
