@@ -150,6 +150,7 @@ namespace CompanionWinRT
             /**
              * Return the image stream.
              *
+             * @throws Platform::Exception if the source is not set
              * @return the image stream of this configurtion
              *
              * Note:
@@ -160,6 +161,8 @@ namespace CompanionWinRT
 
             /**
              * Start the image processing.
+             *
+             * @throws Platform::Exception if the configuration is invalid
              */
             void run();
 

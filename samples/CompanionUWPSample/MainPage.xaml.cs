@@ -28,6 +28,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.FileProperties;
+using Windows.ApplicationModel.Core;
 using CW = CompanionWinRT;
 
 namespace CompanionUWPSample {
@@ -137,6 +138,10 @@ namespace CompanionUWPSample {
 
             // Fill radio button list
             this.radioButtons = new List<RadioButton> { this.fmRButton, this.ihRButton, this.hmRButton, this.sdRButton };
+
+            // Activate UI elements
+            this.startButton.IsEnabled = true;
+            this.radioButtons.ForEach(r => r.IsEnabled = true);
         }
 
         /**
@@ -158,16 +163,22 @@ namespace CompanionUWPSample {
                     await this.CreateConfiguration((ImageProcessingMethod) Int32.Parse(tag.ToString()));
 
                     // Constantly import images as the source for processing
-                    Task task = Task.Run(async () => {
-                        
-                        // Save the source image paths to a list for the 'ImageStream' object
-                        IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
+                    Task imageThread = Task.Run(async () => {
+                        try {
+                            // Save the source image paths to a list for the 'ImageStream' object
+                            IReadOnlyList<StorageFile> fileList = await this.imageFolder.GetFilesAsync();
 
-                        for (int i = 0; (i < fileList.Count) && !this.isCanceling; i++) {
-                            // Use this control to adjust the streaming rate
-                            //await Task.Delay(TimeSpan.FromSeconds(2));
+                            for (int i = 0; (i < fileList.Count) && !this.isCanceling; i++) {
+                                // Use this control to adjust the streaming rate
+                                //await Task.Delay(TimeSpan.FromSeconds(2));
 
-                            this.configuration?.getSource()?.addImage(fileList[i].Path);
+                                this.configuration?.getSource()?.addImage(fileList[i].Path);
+                                if (i == 20) { throw new Exception("imageThread"); }
+                            }
+                        } catch (Exception ex) {
+                            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
+                                this.HandleException(ex);
+                            });
                         }
                     });
 
@@ -178,19 +189,21 @@ namespace CompanionUWPSample {
                     await this.RunCompanion();
 
                     // Wait until the image thread has stopped or finished
-                    await task;
-
-                    // Reset the application
-                    this.startButton.IsEnabled = true;
-                    this.radioButtons.ForEach(r => r.IsEnabled = true);
-                    this.isRunning = false;
-                    this.isCanceling = false;
-                    this.configuration = null;
-                    this.UpdateUIOutput("Processing has been stopped.");
+                    await imageThread;
 
                 } catch (Exception ex) {
                     this.HandleException(ex);
                 }
+
+                // Reset the application
+                this.startButton.IsEnabled = true;
+                this.cancelButton.IsEnabled = false;
+                this.radioButtons.ForEach(r => r.IsEnabled = true);
+                this.isRunning = false;
+                this.isCanceling = false;
+                this.configuration = null;
+                this.UpdateUIOutput("Processing has been stopped.");
+
             } else if (this.isReady) {
                 this.UpdateUIOutput("Processing has already started.");
             }
@@ -206,11 +219,7 @@ namespace CompanionUWPSample {
             if (this.isRunning) {
                 this.isCanceling = true;
                 this.cancelButton.IsEnabled = false;
-                try {
-                    await this.StopCompanion();
-                } catch (Exception ex) {
-                    this.HandleException(ex);
-                }
+                await this.StopCompanion();
             }
         }
 
@@ -282,13 +291,13 @@ namespace CompanionUWPSample {
         }
 
         /**
-         * Result callback method for the companion processing.
+         * Result callback method for the Companion processing.
          * 
-         * @param results   list of results that represent the detected objects
-         * @param image     the processed image with visually markers for the detected objects
+         * @param results   list of results that represent the recognized or detected objects
+         * @param image     the processed image with visual markers for the recognized or detected objects
          */
         public void ResultCallback(IList<CW.Result> results, byte[] image) {
-            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () => {
+            CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () => {
                 try {
                     using (System.IO.Stream stream = this.m_bm.PixelBuffer.AsStream()) {
                         if (stream.CanWrite) {
@@ -302,7 +311,7 @@ namespace CompanionUWPSample {
                         this.UpdateUIOutput("Obj " + i + ": x_" + upperLeftCorner.x + ", y_" + upperLeftCorner.y);
                     }
                 } catch (Exception ex) {
-                    this.UpdateUIOutput(ex.Message);
+                    this.HandleException(ex);
                 }
 
             }).AsTask();
@@ -314,7 +323,7 @@ namespace CompanionUWPSample {
          * @param errorMessage  a specific error message
          */
         public void ErrorCallback(String errorMessage) {
-            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
+            CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
                 this.UpdateUIOutput(errorMessage);
             }).AsTask();
         }
@@ -322,8 +331,7 @@ namespace CompanionUWPSample {
         /**
          * Start the companion processing with the provided 'Configuration' wrapper object.
          * 
-         * @param config    a 'Configuration' wrapper object
-         * @return returns a awaitable asynchronous action
+         * @return returns an awaitable asynchronous action
          */
         private IAsyncAction RunCompanion() {
             return Task.Run(() => {
@@ -334,8 +342,7 @@ namespace CompanionUWPSample {
         /**
          * Stop the companion processing.
          * 
-         * @param config    a 'Configuration' wrapper object
-         * @return returns a awaitable asynchronous action
+         * @return returns an awaitable asynchronous action
          */
         private IAsyncAction StopCompanion() {
             return Task.Run(() => {
@@ -349,13 +356,13 @@ namespace CompanionUWPSample {
          * @param ex    exception that was thrown
          */
         private void HandleException(Exception ex) {
-            String message = "";
+            String message = "Unknown Exception";
             Type errorType = typeof(CW.ErrorCode);
 
-            if (Enum.IsDefined(errorType, ex.HResult)) {
+            if ((ex != null) && Enum.IsDefined(errorType, ex.HResult)) {
                 CW.ErrorCode errorCode = (CW.ErrorCode) Enum.ToObject(errorType, ex.HResult);
                 message = CW.CompanionError.getError(errorCode);
-            } else {
+            } else if (ex != null) {
                 message = ex.Message;
             }
 

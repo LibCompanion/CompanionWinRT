@@ -21,13 +21,13 @@
             <StackPanel Orientation="Horizontal" Grid.Row="0" Width="Auto">
                 <StackPanel Orientation="Vertical" Padding="20,20,0,0">
                     <TextBlock Text="Image Processing Method:" Style="{ThemeResource BaseTextBlockStyle}"/>
-                    <RadioButton x:Name="fmRButton" GroupName="ipmRBGroup" Content="Feature Matching" Tag="0" IsChecked="True"/>
-                    <RadioButton x:Name="ihRButton" GroupName="ipmRBGroup" Content="Image Hashing" Tag="1" />
-                    <RadioButton x:Name="hmRButton" GroupName="ipmRBGroup" Content="Hybrid Matching" Tag="2"/>
-                    <RadioButton x:Name="sdRButton" GroupName="ipmRBGroup" Content="Shape Detection" Tag="3"/>
+                    <RadioButton x:Name="fmRButton" GroupName="ipmRBGroup" Content="Feature Matching" Tag="0" IsEnabled="False" IsChecked="True"/>
+                    <RadioButton x:Name="ihRButton" GroupName="ipmRBGroup" Content="Image Hashing" Tag="1" IsEnabled="False"/>
+                    <RadioButton x:Name="hmRButton" GroupName="ipmRBGroup" Content="Hybrid Matching" Tag="2" IsEnabled="False"/>
+                    <RadioButton x:Name="sdRButton" GroupName="ipmRBGroup" Content="Shape Detection" Tag="3" IsEnabled="False"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="startButton" Content="START" Width="70" Margin="20" Click="StartButton_Click"/>
+                    <Button x:Name="startButton" Content="START" Width="70" Margin="20" Click="StartButton_Click" IsEnabled="False"/>
                     <Button x:Name="cancelButton" Content="Cancel" Width="70" Margin="20" Click="CancelButton_Click" IsEnabled="False"/>
                 </StackPanel>
             </StackPanel>

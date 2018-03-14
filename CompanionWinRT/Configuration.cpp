@@ -142,12 +142,28 @@ void Configuration::setSource(ImageStream^ stream)
 
 ImageStream^ Configuration::getSource()
 {
-    return this->stream;
+    try
+    {
+        return this->stream;
+    }
+    catch (Companion::Error::Code code)
+    {
+        int hresult = static_cast<int>(getErrorCode(code));
+        throw ref new Platform::Exception(hresult);
+    }
 }
 
 void Configuration::run()
 {
-    this->configurationObj.run();
+    try
+    {
+        this->configurationObj.run();
+    }
+    catch (Companion::Error::Code code)
+    {
+        int hresult = static_cast<int>(getErrorCode(code));
+        throw ref new Platform::Exception(hresult);
+    }
 }
 
 void Configuration::stop()
