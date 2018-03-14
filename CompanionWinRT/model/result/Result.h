@@ -33,6 +33,9 @@ namespace CompanionWinRT
     /**
      * This class represents a model to store object detection or recognition results.
      *
+     * Note 1:
+     * This is a minimum construction -- it has to be extended to provide the same flexability as the Companion native code.
+     *
      * Note:
      * Native code in interfaces and public inheritance are not possible in a Windows Runtime context (with very few exceptions).
      * We can not mirror the plausible abstract class 'Result' for this wrapper.

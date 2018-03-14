@@ -34,7 +34,6 @@ SET(SOURCE
     utils/CompanionUtils.cpp utils/CompanionUtils.h
 )
 
-
 # Create MSVC filter
 foreach(source IN LISTS SOURCE)
     get_filename_component(source_path "${source}" PATH)
@@ -42,18 +41,15 @@ foreach(source IN LISTS SOURCE)
     source_group("${source_path_msvc}" FILES "${source}")
 endforeach()
 
-
 # Create library and define it as a WinRT Component
 add_library(CompanionWinRT SHARED ${SOURCE})
 set_target_properties(CompanionWinRT PROPERTIES VS_WINRT_COMPONENT TRUE)
 set_target_properties(CompanionWinRT PROPERTIES VS_GLOBAL_ROOTNAMESPACE "CompanionWinRT")
 set_target_properties(CompanionWinRT PROPERTIES FOLDER "CompanionWinRT")
 
-
 # Set linked libraries
 target_link_libraries(CompanionWinRT ${OpenCV_LIBS})
 target_link_libraries(CompanionWinRT Companion)
-
 
 # add install instructions
 install(TARGETS CompanionWinRT EXPORT CompanionWinRTConfig
