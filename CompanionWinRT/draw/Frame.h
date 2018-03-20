@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+ /// @file
 #pragma once
 
 #include <opencv2/core/core.hpp>
@@ -27,7 +28,14 @@ namespace CompanionWinRT
      */
     public value struct Point
     {
+        /**
+         * X-coordinate of this point.
+         */
         int x;
+
+        /**
+         * Y-coordinate of this point.
+         */
         int y;
     };
 

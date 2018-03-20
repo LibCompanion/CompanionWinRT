@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+ /// @file
 #pragma once
 
 #include <companion\algo\recognition\matching\FeatureMatching.h>

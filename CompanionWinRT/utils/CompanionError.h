@@ -16,6 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file
+ * C++/CX supports a set of standard exceptions that represent typical HRESULT errors. Each standard exception
+ * derives from Platform::COMException, which in turn derives from Platform::Exception. When you throw an
+ * exception across the ABI boundary, you must throw one of the standard exceptions. You can't derive your own
+ * exception type from Platform::Exception. To throw a custom exception, use a user-defined HRESULT to construct
+ * a COMException object. There's no way to specify a custom Message in a COMException. (via docs.microsoft.com)
+ */
 #pragma once
 
 #include <companion/util/CompanionError.h>
@@ -24,16 +32,6 @@
 
 namespace CompanionWinRT
 {
-    
-    /*
-     * C++/CX supports a set of standard exceptions that represent typical HRESULT errors. Each standard exception
-     * derives from Platform::COMException, which in turn derives from Platform::Exception. When you throw an
-     * exception across the ABI boundary, you must throw one of the standard exceptions. You can't derive your own
-     * exception type from Platform::Exception. To throw a custom exception, use a user-defined HRESULT to construct
-     * a COMException object. There's no way to specify a custom Message in a COMException. (via docs.microsoft.com)
-     */
-
-
     /**
      * Error codes (user defined HRESULTs).
      */

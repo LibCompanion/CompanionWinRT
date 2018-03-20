@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @file
 #pragma once
 
 #include <companion/util/Util.h>
@@ -59,7 +60,14 @@ namespace CompanionWinRT
      */
     public value struct Size
     {
+        /**
+         * Width value.
+         */
         int width;
+
+        /**
+         * Height value.
+         */
         int height;
     };
 
